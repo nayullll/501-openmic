@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>501호 오픈 마이크</title>
   <style>
     body { 
@@ -30,7 +31,7 @@
     h2 { color: #3e2723; text-align: center; font-size: 1.8em; margin-top: 0; }
     label { font-weight: bold; color: #555; font-size: 0.9em; margin-top: 15px; display: block; }
     
-    /* 👇 아이폰 사파리를 완벽하게 통제하는 초강력 마법의 코드입니다! */
+    /* 아이폰 사파리를 완벽하게 통제하는 초강력 마법의 코드! */
     input, textarea { 
       display: block; /* 무조건 한 줄을 꽉 채우게 만듦 */
       width: 100%; 
@@ -143,6 +144,7 @@
         lessons.unshift(lesson); 
       }
 
+      // 오타 완벽 수정 완료 (localStorage 소문자!)
       localStorage.setItem('guitarLessons', JSON.stringify(lessons));
       
       document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
@@ -185,6 +187,7 @@
 
     function renderList() {
       const list = document.getElementById('lessonList');
+      // 오타 완벽 수정 완료 (list 소문자!)
       list.innerHTML = '';
       let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
 
