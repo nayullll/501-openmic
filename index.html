@@ -5,77 +5,86 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>501호 오픈 마이크</title>
   <style>
+    /* 👇 요즘 대세! 세련되고 깔끔한 'Pretendard' 폰트 불러오기 */
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
     body { 
-      font-family: 'Malgun Gothic', sans-serif; 
+      font-family: 'Pretendard', sans-serif; 
       margin: 0; 
       padding: 20px; 
-      background-image: url('https://images.unsplash.com/photo-1519508234224-60bc12836242?q=80&w=1500&auto=format&fit=crop');
-      background-size: cover; 
-      background-position: center; 
-      background-attachment: fixed; 
+      background-color: #f4f5f7; /* 눈이 편안한 모던 연회색 배경 */
       display: flex; 
       justify-content: center; 
+      color: #333;
     }
 
     .app-box { 
       width: 100%;
       max-width: 450px; 
-      background: rgba(255, 255, 255, 0.85); 
-      backdrop-filter: blur(10px); 
+      background: #ffffff; /* 깔끔한 올화이트 박스 */
       padding: 30px; 
-      border-radius: 20px; 
-      box-sizing: border-box; /* 박스 자체가 삐져나가지 않게 고정 */
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+      border-radius: 24px; /* 요즘 앱 트렌드에 맞춘 둥근 모서리 */
+      box-sizing: border-box; 
+      box-shadow: 0 15px 35px rgba(0,0,0,0.05); /* 은은하고 고급스러운 그림자 */
     }
 
-    h2 { color: #3e2723; text-align: center; font-size: 1.8em; margin-top: 0; }
-    label { font-weight: bold; color: #555; font-size: 0.9em; margin-top: 15px; display: block; }
+    h2 { color: #111; text-align: center; font-size: 1.6em; font-weight: 800; margin-top: 0; letter-spacing: -0.5px; }
+    label { font-weight: 600; color: #666; font-size: 0.85em; margin-top: 20px; display: block; letter-spacing: -0.3px; }
     
-    /* 아이폰 사파리를 완벽하게 통제하는 초강력 마법의 코드! */
     input, textarea { 
-      display: block; /* 무조건 한 줄을 꽉 채우게 만듦 */
+      display: block; 
       width: 100%; 
-      max-width: 100%; /* 어떤 일이 있어도 100%를 넘지 못하게 강제! */
+      max-width: 100%; 
       box-sizing: border-box; 
-      padding: 12px; 
-      margin: 5px 0 15px 0; 
-      border: 1px solid #ccc; 
-      border-radius: 8px; 
-      font-size: 16px; /* 아이폰에서 화면이 제멋대로 확대되는 것 방지 */
-      font-family: inherit; /* 글씨체도 통일 */
-      background: rgba(255,255,255,0.9);
-      -webkit-appearance: none; /* 사파리 기본 디자인 완벽 제거 */
+      padding: 14px 16px; 
+      margin: 8px 0 15px 0; 
+      border: 1px solid #e1e1e1; 
+      border-radius: 12px; 
+      font-size: 16px; 
+      font-family: inherit; 
+      background: #fafafa;
+      color: #222;
+      -webkit-appearance: none; 
       appearance: none;
+      transition: 0.2s;
     }
-    input { height: 46px; } /* 날짜 칸과 일반 글자 칸의 높이를 똑같이 맞춤 */
-    textarea { height: 80px; resize: none; }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #222; /* 터치했을 때 시크하게 블랙 테두리로 강조! */
+      background: #fff;
+    }
+    input { height: 50px; } 
+    textarea { height: 90px; resize: none; }
 
     #saveBtn { 
-      width: 100%; padding: 15px; margin-top: 10px;
-      background-color: #8d6e63; color: white; border: none; 
-      border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; 
-      transition: 0.3s; 
+      width: 100%; padding: 16px; margin-top: 15px;
+      background-color: #222; /* 시크한 블랙 버튼 */
+      color: white; border: none; 
+      border-radius: 14px; font-size: 1.1em; font-weight: 700; cursor: pointer; 
+      transition: 0.2s; 
     }
-    #saveBtn:hover { background-color: #5d4037; }
+    #saveBtn:hover { background-color: #444; }
 
-    .record-item { background: white; border-left: 5px solid #8d6e63; padding: 15px; margin-top: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative;}
-    .tag { display: inline-block; background: #efebe9; padding: 4px 10px; border-radius: 12px; font-size: 0.8em; margin-right: 5px; color: #5d4037; font-weight: bold;}
-    .link-btn { display: inline-block; margin-top: 10px; padding: 8px 15px; background: #5d4037; color: white; text-decoration: none; border-radius: 20px; font-size: 0.9em; font-weight: bold;}
-    .link-btn:hover { background: #3e2723; }
+    .record-item { background: #fff; border: 1px solid #eaeaea; padding: 20px; margin-top: 20px; border-radius: 16px; position: relative;}
+    .record-item h3 { margin-top: 0; color: #111; font-size: 1.1em; font-weight: 700; margin-bottom: 15px;}
+    .record-item p { font-size: 0.95em; color: #444; margin: 8px 0; line-height: 1.5;}
+    .tag { display: inline-block; background: #f0f0f0; padding: 4px 10px; border-radius: 8px; font-size: 0.8em; margin-right: 5px; color: #555; font-weight: 600;}
+    .link-btn { display: inline-block; margin-top: 12px; padding: 10px 18px; background: #f4f5f7; color: #222; text-decoration: none; border-radius: 10px; font-size: 0.9em; font-weight: 700; border: 1px solid #e1e1e1;}
+    .link-btn:hover { background: #e9ecef; }
 
     .action-btns {
-      margin-top: 15px;
+      margin-top: 20px;
       text-align: right;
-      border-top: 1px dashed #ccc;
-      padding-top: 10px;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 15px;
     }
     .edit-btn, .delete-btn {
-      background: none; border: none; font-size: 0.9em; cursor: pointer; padding: 5px 10px; border-radius: 5px; font-weight: bold;
+      background: none; border: none; font-size: 0.85em; cursor: pointer; padding: 6px 12px; border-radius: 8px; font-weight: 600; margin-left: 5px;
     }
-    .edit-btn { color: #1976D2; }
-    .edit-btn:hover { background: #e3f2fd; }
-    .delete-btn { color: #d32f2f; }
-    .delete-btn:hover { background: #ffebee; }
+    .edit-btn { color: #555; background: #f4f5f7;}
+    .edit-btn:hover { background: #e9ecef; }
+    .delete-btn { color: #ff4d4f; background: #fff0f0;}
+    .delete-btn:hover { background: #ffe5e5; }
   </style>
 </head>
 <body>
@@ -138,13 +147,12 @@
         }
         editTargetId = null; 
         document.getElementById('saveBtn').innerText = '기록 저장하기'; 
-        document.getElementById('saveBtn').style.backgroundColor = '#8d6e63';
+        document.getElementById('saveBtn').style.backgroundColor = '#222'; /* 원래 블랙으로 복구 */
       } else {
         const lesson = { id: Date.now(), date, song, overview, tips, chords, homework, driveLink };
         lessons.unshift(lesson); 
       }
 
-      // 오타 완벽 수정 완료 (localStorage 소문자!)
       localStorage.setItem('guitarLessons', JSON.stringify(lessons));
       
       document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
@@ -187,17 +195,16 @@
 
     function renderList() {
       const list = document.getElementById('lessonList');
-      // 오타 완벽 수정 완료 (list 소문자!)
       list.innerHTML = '';
       let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
 
       lessons.forEach(lesson => {
         let content = `<div class="record-item">
-            <h3 style="margin-top:0; color:#5d4037; font-size: 1.2em;">${lesson.date} - ${lesson.overview}</h3>`;
+            <h3>${lesson.date} - ${lesson.overview}</h3>`;
             if(lesson.song) content += `<p><strong>🎵 곡명:</strong> ${lesson.song}</p>`;
             if(lesson.chords) content += `<p><span class="tag">코드</span> ${lesson.chords}</p>`;
             if(lesson.tips) content += `<p><strong>💡 꿀팁:</strong> ${lesson.tips}</p>`;
-            if(lesson.homework) content += `<p style="color:#c62828;"><strong>🔥 과제:</strong> ${lesson.homework}</p>`;
+            if(lesson.homework) content += `<p style="color:#ff4d4f;"><strong>🔥 과제:</strong> ${lesson.homework}</p>`;
             if(lesson.driveLink) content += `<a href="${lesson.driveLink}" target="_blank" class="link-btn">📁 자료 보기</a>`;
             
             content += `
