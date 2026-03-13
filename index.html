@@ -1,3 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>501호 오픈 마이크</title>
+  <style>
+    body { 
+      font-family: 'Malgun Gothic', sans-serif; 
+      margin: 0; 
+      padding: 20px; 
+      background-image: url('https://images.unsplash.com/photo-1519508234224-60bc12836242?q=80&w=1500&auto=format&fit=crop');
+      background-size: cover; 
+      background-position: center; 
+      background-attachment: fixed; 
+      display: flex; 
+      justify-content: center; 
+    }
+
+    .app-box { 
+      width: 100%;
+      max-width: 450px; 
+      background: rgba(255, 255, 255, 0.85); 
+      backdrop-filter: blur(10px); 
+      padding: 30px; 
+      border-radius: 20px; 
+      box-sizing: border-box; /* 박스 자체가 삐져나가지 않게 고정 */
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+    }
+
+    h2 { color: #3e2723; text-align: center; font-size: 1.8em; margin-top: 0; }
+    label { font-weight: bold; color: #555; font-size: 0.9em; margin-top: 15px; display: block; }
+    
+    /* 👇 아이폰 사파리를 완벽하게 통제하는 초강력 마법의 코드입니다! */
+    input, textarea { 
+      display: block; /* 무조건 한 줄을 꽉 채우게 만듦 */
+      width: 100%; 
+      max-width: 100%; /* 어떤 일이 있어도 100%를 넘지 못하게 강제! */
+      box-sizing: border-box; 
+      padding: 12px; 
+      margin: 5px 0 15px 0; 
+      border: 1px solid #ccc; 
+      border-radius: 8px; 
+      font-size: 16px; /* 아이폰에서 화면이 제멋대로 확대되는 것 방지 */
+      font-family: inherit; /* 글씨체도 통일 */
+      background: rgba(255,255,255,0.9);
+      -webkit-appearance: none; /* 사파리 기본 디자인 완벽 제거 */
+      appearance: none;
+    }
+    input { height: 46px; } /* 날짜 칸과 일반 글자 칸의 높이를 똑같이 맞춤 */
+    textarea { height: 80px; resize: none; }
+
+    #saveBtn { 
+      width: 100%; padding: 15px; margin-top: 10px;
+      background-color: #8d6e63; color: white; border: none; 
+      border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; 
+      transition: 0.3s; 
+    }
+    #saveBtn:hover { background-color: #5d4037; }
+
+    .record-item { background: white; border-left: 5px solid #8d6e63; padding: 15px; margin-top: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative;}
+    .tag { display: inline-block; background: #efebe9; padding: 4px 10px; border-radius: 12px; font-size: 0.8em; margin-right: 5px; color: #5d4037; font-weight: bold;}
+    .link-btn { display: inline-block; margin-top: 10px; padding: 8px 15px; background: #5d4037; color: white; text-decoration: none; border-radius: 20px; font-size: 0.9em; font-weight: bold;}
+    .link-btn:hover { background: #3e2723; }
+
+    .action-btns {
+      margin-top: 15px;
+      text-align: right;
+      border-top: 1px dashed #ccc;
+      padding-top: 10px;
+    }
+    .edit-btn, .delete-btn {
+      background: none; border: none; font-size: 0.9em; cursor: pointer; padding: 5px 10px; border-radius: 5px; font-weight: bold;
+    }
+    .edit-btn { color: #1976D2; }
+    .edit-btn:hover { background: #e3f2fd; }
+    .delete-btn { color: #d32f2f; }
+    .delete-btn:hover { background: #ffebee; }
+  </style>
+</head>
+<body>
+
+  <div class="app-box">
+    <h2>🎤 501호 오픈 마이크</h2>
+    
+    <label>📅 레슨 날짜</label>
+    <input type="date" id="date">
+
+    <label>🎵 곡명 (연습곡)</label>
+    <input type="text" id="song" placeholder="예: 변하은 - 기지개">
+
+    <label>📝 오늘 배운 내용 (개요)</label>
+    <input type="text" id="overview" placeholder="예: 아르페지오 주법 기초 및 자세 교정">
+
+    <label>💡 선생님의 꿀팁 & 노하우</label>
+    <textarea id="tips" placeholder="예: 엄지손가락에 힘을 빼고 자연스럽게 튕기기"></textarea>
+
+    <label>🎸 새로 배운 코드</label>
+    <input type="text" id="chords" placeholder="예: F코드, Bm7">
+
+    <label>🔥 다음 주 과제</label>
+    <input type="text" id="homework" placeholder="예: 메트로놈 80에 맞춰 1절 완곡하기">
+
+    <label>🔗 참고 자료 (구글 드라이브 링크)</label>
+    <input type="text" id="driveLink" placeholder="예: https://drive.google.com/file/d/...">
+
+    <button id="saveBtn" onclick="saveLesson()">기록 저장하기</button>
+
+    <div id="lessonList">
+      </div>
+  </div>
+
+  <script>
+    let editTargetId = null; 
+
+    window.onload = renderList;
+
+    function saveLesson() {
+      const date = document.getElementById('date').value;
+      const song = document.getElementById('song').value;
+      const overview = document.getElementById('overview').value;
+      const tips = document.getElementById('tips').value;
+      const chords = document.getElementById('chords').value;
+      const homework = document.getElementById('homework').value;
+      const driveLink = document.getElementById('driveLink').value;
+
+      if(!date || !overview) {
+        alert('날짜와 배운 내용은 꼭 입력해 주세요!');
+        return;
+      }
+
+      let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
+
+      if (editTargetId) {
+        const index = lessons.findIndex(lesson => lesson.id === editTargetId);
+        if (index !== -1) {
+          lessons[index] = { id: editTargetId, date, song, overview, tips, chords, homework, driveLink };
+        }
+        editTargetId = null; 
+        document.getElementById('saveBtn').innerText = '기록 저장하기'; 
+        document.getElementById('saveBtn').style.backgroundColor = '#8d6e63';
+      } else {
+        const lesson = { id: Date.now(), date, song, overview, tips, chords, homework, driveLink };
+        lessons.unshift(lesson); 
+      }
+
+      localStorage.setItem('guitarLessons', JSON.stringify(lessons));
+      
+      document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
+      document.getElementById('date').value = '';
+      document.getElementById('driveLink').value = '';
+      
+      renderList();
+    }
+
+    function editLesson(id) {
+      let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
+      const lesson = lessons.find(l => l.id === id);
+      if(!lesson) return;
+
+      document.getElementById('date').value = lesson.date;
+      document.getElementById('song').value = lesson.song || '';
+      document.getElementById('overview').value = lesson.overview || '';
+      document.getElementById('tips').value = lesson.tips || '';
+      document.getElementById('chords').value = lesson.chords || '';
+      document.getElementById('homework').value = lesson.homework || '';
+      document.getElementById('driveLink').value = lesson.driveLink || '';
+
+      editTargetId = id; 
+      
+      const saveBtn = document.getElementById('saveBtn');
+      saveBtn.innerText = '✨ 수정 완료하기';
+      saveBtn.style.backgroundColor = '#1976D2'; 
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteLesson(id) {
+      if(confirm('정말 이 기록을 삭제할까요? 지우면 복구할 수 없습니다!')) {
+        let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
+        lessons = lessons.filter(l => l.id !== id); 
         localStorage.setItem('guitarLessons', JSON.stringify(lessons));
         renderList();
       }
