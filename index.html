@@ -1,0 +1,33 @@
+        localStorage.setItem('guitarLessons', JSON.stringify(lessons));
+        renderList();
+      }
+    }
+
+    function renderList() {
+      const list = document.getElementById('lessonList');
+      list.innerHTML = '';
+      let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
+
+      lessons.forEach(lesson => {
+        let content = `<div class="record-item">
+            <h3 style="margin-top:0; color:#5d4037; font-size: 1.2em;">${lesson.date} - ${lesson.overview}</h3>`;
+            if(lesson.song) content += `<p><strong>🎵 곡명:</strong> ${lesson.song}</p>`;
+            if(lesson.chords) content += `<p><span class="tag">코드</span> ${lesson.chords}</p>`;
+            if(lesson.tips) content += `<p><strong>💡 꿀팁:</strong> ${lesson.tips}</p>`;
+            if(lesson.homework) content += `<p style="color:#c62828;"><strong>🔥 과제:</strong> ${lesson.homework}</p>`;
+            if(lesson.driveLink) content += `<a href="${lesson.driveLink}" target="_blank" class="link-btn">📁 자료 보기</a>`;
+            
+            content += `
+            <div class="action-btns">
+              <button class="edit-btn" onclick="editLesson(${lesson.id})">수정</button>
+              <button class="delete-btn" onclick="deleteLesson(${lesson.id})">삭제</button>
+            </div>`;
+            
+        content += `</div>`;
+        list.innerHTML += content;
+      });
+    }
+  </script>
+
+</body>
+</html>
