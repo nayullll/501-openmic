@@ -4,140 +4,79 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>501호 오픈 마이크</title>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="501호 레슨">
+  <meta name="mobile-web-app-capable" content="yes">
   
+  <title>501호 오픈 마이크</title>
   <link rel="apple-touch-icon" href="https://i.postimg.cc/C1bnY8Ln/IMG-6011.jpg?v=8">
 
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
     :root {
-      --bg-color: #f4f5f7;
-      --card-bg: #ffffff;
-      --text-main: #111111;
-      --text-sub: #666666;
-      --border-color: #e1e1e1;
-      --input-bg: #fafafa;
-      --primary-color: #222222;
-      --accent-blue: #1976D2;
+      --bg-color: #f4f5f7; --card-bg: #ffffff; --text-main: #111111;
+      --text-sub: #666666; --border-color: #e1e1e1; --input-bg: #fafafa;
+      --primary-color: #222222; --accent-blue: #1976D2; --chord-orange: #EDA18C;
     }
 
     [data-theme='dark'] {
-      --bg-color: #1a1a1a;
-      --card-bg: #2d2d2d;
-      --text-main: #eeeeee;
-      --text-sub: #aaaaaa;
-      --border-color: #444444;
-      --input-bg: #3d3d3d;
+      --bg-color: #1a1a1a; --card-bg: #2d2d2d; --text-main: #eeeeee;
+      --text-sub: #aaaaaa; --border-color: #444444; --input-bg: #3d3d3d;
       --primary-color: #ffffff;
     }
 
     body { 
-      font-family: 'Pretendard', sans-serif; 
-      margin: 0; padding: 20px; 
-      background-color: var(--bg-color); 
-      display: flex; flex-direction: column; align-items: center;
+      font-family: 'Pretendard', sans-serif; margin: 0; padding: 20px; 
+      background-color: var(--bg-color); display: flex; flex-direction: column; align-items: center;
       color: var(--text-main); transition: background-color 0.3s ease;
     }
 
-    .app-box { 
-      width: 100%; max-width: 450px; 
-      background: var(--card-bg); padding: 30px; 
-      border-radius: 24px; box-sizing: border-box; 
-      box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
-    }
-
+    .app-box { width: 100%; max-width: 450px; background: var(--card-bg); padding: 30px; border-radius: 24px; box-sizing: border-box; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
     .main-image { width: 100%; height: 200px; object-fit: cover; border-radius: 16px; margin-bottom: 20px; }
-
     .title-wrap { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .theme-toggle { background: var(--input-bg); border: 1px solid var(--border-color); width: 42px; height: 42px; border-radius: 12px; cursor: pointer; font-size: 1.2em; display: flex; align-items: center; justify-content: center; padding: 0; }
     
-    .theme-toggle {
-      background: var(--input-bg); border: 1px solid var(--border-color);
-      width: 42px; height: 42px; border-radius: 12px; cursor: pointer; font-size: 1.2em;
-      display: flex; align-items: center; justify-content: center; padding: 0;
-    }
-
     h2 { color: var(--text-main); font-size: 1.5em; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
     label { font-weight: 600; color: var(--text-sub); font-size: 0.85em; margin-top: 20px; display: block; }
     
-    /* 👇 모든 input 박스 너비를 동일하게 고정 (날짜 박스 포함) */
     input, textarea { 
-      display: block; 
-      width: 100%; 
-      max-width: 100%; /* 너비 초과 방지 */
-      box-sizing: border-box; 
-      padding: 14px 16px; 
-      margin: 8px 0 15px 0; 
-      border: 1px solid var(--border-color); 
-      border-radius: 12px; 
-      font-size: 16px; 
-      font-family: inherit; 
-      background: var(--input-bg); 
-      color: var(--text-main); 
-      transition: 0.2s;
-      -webkit-appearance: none; /* 아이폰 기본 스타일 제거 */
+      display: block; width: 100%; box-sizing: border-box; padding: 14px 16px; margin: 8px 0 15px 0; 
+      border: 1px solid var(--border-color); border-radius: 12px; font-size: 16px; font-family: inherit; 
+      background: var(--input-bg); color: var(--text-main); transition: 0.2s; -webkit-appearance: none;
     }
     input:focus, textarea:focus { outline: none; border-color: var(--accent-blue); }
 
-    /* 날짜 입력창 전용 스타일 (아이폰 등에서 길어지는 현상 방지) */
-    input[type="date"] {
-      min-height: 50px;
-    }
-
     .chord-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
     .chord-input-row input { margin: 0; }
-    
-    .add-row-btn {
-      background: var(--input-bg); color: var(--text-sub); text-align: center; padding: 12px; 
-      border-radius: 10px; font-size: 0.9em; font-weight: 700; cursor: pointer; margin-bottom: 15px;
-    }
+    .add-row-btn { background: var(--input-bg); color: var(--text-sub); text-align: center; padding: 12px; border-radius: 10px; font-size: 0.9em; font-weight: 700; cursor: pointer; margin-bottom: 15px; }
 
-    .chord-grid { 
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; 
-      margin-top: 10px; background: var(--input-bg); padding: 12px; border-radius: 12px; 
-      box-sizing: border-box; width: 100%;
-    }
-    
-    .chord-card { 
-      background: #EDA18C; border-radius: 10px; padding: 10px 4px; 
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-width: 0; overflow: hidden;
-    }
-    .chord-card p { 
-      margin: 0; font-weight: 800; font-size: 1em; color: #ffffff !important; 
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 90%; text-align: center;
-    }
-    .chord-link-btn { 
-      margin-top: 6px; padding: 4px 8px; background: #ffffff; color: #EDA18C; 
-      text-decoration: none; border-radius: 6px; font-size: 0.7em; font-weight: 800; 
-      white-space: nowrap;
-    }
-    
-    #saveBtn { 
-      width: 100%; padding: 16px; margin-top: 15px; background-color: var(--primary-color); 
-      color: var(--card-bg); border: none; border-radius: 14px; font-size: 1.05em; font-weight: 700; cursor: pointer;
-    }
+    /* 코드 도감 스타일 */
+    .chord-encyclopedia { margin: 20px 0; padding: 20px; background: var(--input-bg); border-radius: 16px; display: none; }
+    .ency-title { font-weight: 800; font-size: 1em; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+    .ency-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .ency-item { background: var(--chord-orange); color: #fff; padding: 8px 4px; border-radius: 8px; font-size: 0.8em; font-weight: 700; text-align: center; }
+    .toggle-ency-btn { width: 100%; padding: 12px; background: var(--accent-blue); color: #fff; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
 
+    /* 기존 코드 그리드 */
+    .chord-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; background: var(--input-bg); padding: 12px; border-radius: 12px; width: 100%; box-sizing: border-box; }
+    .chord-card { background: var(--chord-orange); border-radius: 10px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; }
+    .chord-card p { margin: 0; font-weight: 800; font-size: 1em; color: #ffffff !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 90%; text-align: center; }
+    .chord-link-btn { margin-top: 6px; padding: 4px 8px; background: #ffffff; color: var(--chord-orange); text-decoration: none; border-radius: 6px; font-size: 0.7em; font-weight: 800; }
+    
+    #saveBtn { width: 100%; padding: 16px; margin-top: 15px; background-color: var(--primary-color); color: var(--card-bg); border: none; border-radius: 14px; font-size: 1.05em; font-weight: 700; cursor: pointer; }
     .record-item { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; margin-top: 15px; border-radius: 16px; }
     .record-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
     .record-header h3 { margin: 0; color: var(--text-main); font-size: 1.05em; }
     .song-badge { font-size: 0.8em; background: var(--input-bg); color: var(--text-sub); padding: 4px 10px; border-radius: 12px; }
-    
     .record-details { margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); display: none; }
     .record-item p { font-size: 0.95em; color: var(--text-main); margin: 12px 0; line-height: 1.6;}
-    
     .action-btns { margin-top: 20px; text-align: right; border-top: 1px solid var(--border-color); padding-top: 15px; }
-    .edit-btn, .delete-btn { border: none; font-size: 0.85em; cursor: pointer; padding: 8px 12px; border-radius: 8px; font-weight: 600; margin-left: 5px; }
+    .edit-btn, .delete-btn { border: none; font-size: 0.85em; padding: 8px 12px; border-radius: 8px; font-weight: 600; margin-left: 5px; }
     .edit-btn { color: var(--text-main); background: var(--input-bg); }
     .delete-btn { color: #ff4d4f; background: #fff0f0; }
-
-    .data-management { margin-top: 40px; padding-top: 20px; border-top: 1px dashed var(--border-color); text-align: center; }
     .data-btns { display: flex; gap: 10px; margin-top: 15px; }
-    .data-btns button, .import-label { 
-      flex: 1; height: 48px; background: var(--input-bg); border: 1px solid var(--border-color); 
-      border-radius: 12px; font-size: 0.9em; font-weight: 700; cursor: pointer; 
-      color: var(--text-main); display: flex; align-items: center; justify-content: center; margin: 0;
-    }
+    .data-btns button, .import-label { flex: 1; height: 48px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; font-size: 0.9em; font-weight: 700; cursor: pointer; color: var(--text-main); display: flex; align-items: center; justify-content: center; }
   </style>
 </head>
 <body data-theme="light">
@@ -150,26 +89,26 @@
 
     <img src="https://i.postimg.cc/rmfjc5Yn/IMG-6009.jpg" alt="메인 사진" class="main-image">
 
-    <label>📅 날짜</label>
+    <label>📅 레슨 날짜</label>
     <input type="date" id="date">
 
     <label>🎵 곡명 (연습곡)</label>
     <input type="text" id="song" placeholder="예: 변하은 - 기지개">
 
     <label>📝 오늘 배운 내용</label>
-    <textarea id="overview" placeholder="해머링"></textarea>
+    <textarea id="overview" placeholder="배운 기술이나 이론"></textarea>
 
     <label>💡스승님의 특급 꿀팁</label>
-    <textarea id="tips" placeholder="연습을 너무 열심히 해선 안된다!"></textarea>
+    <textarea id="tips" placeholder="잊지 말아야 할 포인트!"></textarea>
 
     <label>🎸 새로 배운 코드</label>
     <div id="chordInputContainer"></div>
     <div class="add-row-btn" onclick="addChordRow()">+ 코드 칸 추가하기</div>
 
     <label>🔥 다음 주 과제</label>
-    <textarea id="homework" placeholder="재미있어!!!"></textarea>
+    <textarea id="homework" placeholder="이번 주 숙제는?"></textarea>
 
-    <label>💭 연습 일기 & 궁금증</label>
+    <label>💭 나의 연습 일기 & 궁금증</label>
     <textarea id="selfNote" placeholder="연습하며 느낀 점, 질문 등"></textarea>
 
     <label>🔗 참고 자료 (드라이브 링크)</label>
@@ -177,13 +116,18 @@
 
     <button id="saveBtn" onclick="saveLesson()">누가 그랬던가 잊혀져 간다는 게 일부러 그런 건 아닙디다</button>
 
-    <div style="margin-top: 40px;">
-      <input type="text" id="searchInput" placeholder="🔍 곡명, 내용 검색..." onkeyup="renderList()">
+    <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--border-color);">
+
+    <button class="toggle-ency-btn" onclick="toggleEncyclopedia()">📚 나의 코드 도감 보기</button>
+    <div class="chord-encyclopedia" id="chordEncy">
+      <div class="ency-title">모든 수집 코드 <span id="encyCount" style="color:var(--accent-blue); font-size:0.8em;">0개</span></div>
+      <div class="ency-grid" id="encyGrid"></div>
     </div>
 
+    <input type="text" id="searchInput" placeholder="🔍 곡명, 내용 검색..." onkeyup="renderList()" style="margin-top: 10px;">
     <div id="lessonList"></div>
 
-    <div class="data-management">
+    <div style="margin-top: 40px; text-align: center;">
       <p style="font-size: 0.85em; color: var(--text-sub); font-weight: 600;">💾 데이터 관리</p>
       <div class="data-btns">
         <button onclick="exportData()">백업</button>
@@ -199,6 +143,7 @@
     window.onload = () => {
       initTheme();
       renderList();
+      updateEncyclopedia();
       if(document.getElementById('chordInputContainer').innerHTML === "") addChordRow();
     };
 
@@ -216,13 +161,43 @@
       document.getElementById('themeBtn').innerText = newTheme === 'light' ? '🌙' : '☀️';
     }
 
-    function formatText(text) { return text ? text.replace(/\n/g, '<br>') : ''; }
+    function toggleEncyclopedia() {
+      const ency = document.getElementById('chordEncy');
+      const btn = document.querySelector('.toggle-ency-btn');
+      if(ency.style.display === 'block') {
+        ency.style.display = 'none';
+        btn.innerText = '📚 나의 코드 도감 보기';
+      } else {
+        ency.style.display = 'block';
+        btn.innerText = '닫기';
+        updateEncyclopedia();
+      }
+    }
+
+    function updateEncyclopedia() {
+      const lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
+      const encyGrid = document.getElementById('encyGrid');
+      const encyCount = document.getElementById('encyCount');
+      
+      let allChords = new Set();
+      lessons.forEach(l => {
+        if(l.chordsList) {
+          l.chordsList.forEach(c => {
+            if(c.name.trim()) allChords.add(c.name.trim().toUpperCase());
+          });
+        }
+      });
+
+      const sortedChords = Array.from(allChords).sort();
+      encyCount.innerText = `${sortedChords.length}개`;
+      encyGrid.innerHTML = sortedChords.map(name => `<div class="ency-item">${name}</div>`).join('');
+    }
 
     function addChordRow(nameStr = '', linkStr = '') {
       const container = document.getElementById('chordInputContainer');
       const row = document.createElement('div');
       row.className = 'chord-input-row';
-      row.innerHTML = `<input type="text" class="chord-name" placeholder="코드명" value="${nameStr}">
+      row.innerHTML = `<input type="text" class="chord-name" placeholder="코드" value="${nameStr}">
                        <input type="text" class="chord-link" placeholder="링크" value="${linkStr}">`;
       container.appendChild(row);
     }
@@ -247,7 +222,6 @@
       });
 
       let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
-
       if (editTargetId) {
         const index = lessons.findIndex(l => l.id === editTargetId);
         if (index !== -1) lessons[index] = { id: editTargetId, date, song, overview, tips, chordsList, homework, selfNote, driveLink };
@@ -259,16 +233,12 @@
 
       localStorage.setItem('guitarLessons', JSON.stringify(lessons));
       renderList();
+      updateEncyclopedia();
       
       document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
       document.getElementById('date').value = '';
       document.getElementById('chordInputContainer').innerHTML = '';
       addChordRow();
-    }
-
-    function toggleDetails(id) {
-      const details = document.getElementById(`details-${id}`);
-      details.style.display = details.style.display === 'block' ? 'none' : 'block';
     }
 
     function renderList() {
@@ -288,16 +258,16 @@
               ${lesson.song ? `<span class="song-badge">🎵 ${lesson.song}</span>` : ''}
             </div>
             <div class="record-details" id="details-${lesson.id}">
-              <p><strong>📝 배운 내용:</strong><br>${formatText(lesson.overview)}</p>
-              ${lesson.tips ? `<p><strong>💡 스승님 꿀팁:</strong><br>${formatText(lesson.tips)}</p>` : ''}
+              <p><strong>📝 배운 내용:</strong><br>${lesson.overview.replace(/\n/g, '<br>')}</p>
+              ${lesson.tips ? `<p><strong>💡 꿀팁:</strong><br>${lesson.tips.replace(/\n/g, '<br>')}</p>` : ''}
               ${lesson.chordsList && lesson.chordsList.length > 0 ? `
                 <div class="chord-grid">${lesson.chordsList.map(c => `
                   <div class="chord-card">
                     <p>${c.name}</p>
                     ${c.link ? `<a href="${c.link}" target="_blank" class="chord-link-btn">🖼️ 보기</a>` : ''}
                   </div>`).join('')}</div>` : ''}
-              ${lesson.homework ? `<p style="color:#ff4d4f;"><strong>🔥 과제:</strong><br>${formatText(lesson.homework)}</p>` : ''}
-              ${lesson.selfNote ? `<p style="color:var(--accent-blue);"><strong>💭 나의 연습 일기:</strong><br>${formatText(lesson.selfNote)}</p>` : ''}
+              ${lesson.homework ? `<p style="color:#ff4d4f;"><strong>🔥 과제:</strong><br>${lesson.homework.replace(/\n/g, '<br>')}</p>` : ''}
+              ${lesson.selfNote ? `<p style="color:var(--accent-blue);"><strong>💭 나의 연습 일기:</strong><br>${lesson.selfNote.replace(/\n/g, '<br>')}</p>` : ''}
               ${lesson.driveLink ? `<a href="${lesson.driveLink}" target="_blank" style="display:inline-block; margin-top:10px; font-size:0.85em; color:var(--accent-blue);">📁 참고 자료 링크</a>` : ''}
               <div class="action-btns">
                 <button class="edit-btn" onclick="editLesson(${lesson.id})">수정</button>
@@ -307,6 +277,11 @@
           </div>`;
         list.innerHTML += content;
       });
+    }
+
+    function toggleDetails(id) {
+      const details = document.getElementById(`details-${id}`);
+      details.style.display = details.style.display === 'block' ? 'none' : 'block';
     }
 
     function editLesson(id) {
@@ -319,32 +294,30 @@
       document.getElementById('homework').value = l.homework || '';
       document.getElementById('selfNote').value = l.selfNote || '';
       document.getElementById('driveLink').value = l.driveLink || '';
-      
       const container = document.getElementById('chordInputContainer');
       container.innerHTML = '';
       if(l.chordsList) l.chordsList.forEach(c => addChordRow(c.name, c.link));
       else addChordRow();
-      
       editTargetId = id;
       document.getElementById('saveBtn').innerText = '✨ 수정 완료하기';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function deleteLesson(id) {
-      if(confirm('정말 삭제할까요?')) {
+      if(confirm('삭제할까요?')) {
         let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
         localStorage.setItem('guitarLessons', JSON.stringify(lessons.filter(l => l.id !== id)));
-        renderList();
+        renderList(); updateEncyclopedia();
       }
     }
 
     function exportData() {
       const data = localStorage.getItem('guitarLessons');
-      if(!data) { alert('데이터가 없습니다.'); return; }
+      if(!data) { alert('데이터 없음'); return; }
       const blob = new Blob([data], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `guitar_lesson_backup.json`;
+      a.download = `guitar_backup.json`;
       a.click();
     }
 
@@ -352,7 +325,7 @@
       const reader = new FileReader();
       reader.onload = (e) => {
         localStorage.setItem('guitarLessons', e.target.result);
-        renderList();
+        renderList(); updateEncyclopedia();
         alert('복구 완료!');
       };
       reader.readAsText(event.target.files[0]);
