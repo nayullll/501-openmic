@@ -55,35 +55,19 @@
       position: relative;
     }
 
-    /* 통계 섹션 스타일 */
-    .stats-container {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 25px;
-    }
-    .stat-card {
-      background: var(--input-bg);
-      padding: 15px;
-      border-radius: 16px;
-      text-align: center;
-      border: 1px solid var(--border-color);
-    }
-    .stat-card span { display: block; font-size: 0.75em; color: var(--text-sub); margin-bottom: 5px; }
-    .stat-card strong { font-size: 1.2em; color: var(--accent-blue); }
-
     .main-image {
       width: 100%; height: 200px; object-fit: cover; border-radius: 16px; margin-bottom: 20px; 
     }
 
     .title-wrap {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;
     }
     
     .theme-toggle {
       background: var(--input-bg);
       border: 1px solid var(--border-color);
-      padding: 8px; border-radius: 12px; cursor: pointer; font-size: 1.2em;
+      width: 42px; height: 42px; border-radius: 12px; cursor: pointer; font-size: 1.2em;
+      display: flex; align-items: center; justify-content: center; padding: 0;
     }
 
     h2 { color: var(--text-main); font-size: 1.5em; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
@@ -113,6 +97,7 @@
     .chord-card { 
       background: #EDA18C; border-radius: 10px; padding: 8px 4px; 
       display: flex; flex-direction: column; align-items: center; aspect-ratio: 1 / 1; 
+      justify-content: center;
     }
     .chord-card p { margin: 0; font-weight: 800; font-size: 1.1em; color: #ffffff !important; }
     .chord-link-btn { margin-top: 6px; padding: 4px 6px; background: #ffffff; color: #EDA18C; text-decoration: none; border-radius: 6px; font-size: 0.75em; font-weight: 800; }
@@ -137,9 +122,33 @@
     .edit-btn { color: var(--text-main); background: var(--input-bg); }
     .delete-btn { color: #ff4d4f; background: #fff0f0; }
 
+    /* 데이터 관리 섹션 수정 - 정렬 핵심 */
     .data-management { margin-top: 40px; padding-top: 20px; border-top: 1px dashed var(--border-color); text-align: center; }
-    .data-btns { display: flex; gap: 10px; margin-top: 10px; }
-    .data-btns button, .import-btn { flex: 1; height: 40px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; font-size: 0.85em; cursor: pointer; color: var(--text-main); display: flex; align-items: center; justify-content: center;}
+    .data-btns { 
+      display: flex; 
+      gap: 10px; 
+      margin-top: 15px; 
+      justify-content: center;
+      align-items: stretch; /* 높이 맞춤 */
+    }
+    .data-btns button, .import-label { 
+      flex: 1; 
+      height: 48px; 
+      background: var(--input-bg); 
+      border: 1px solid var(--border-color); 
+      border-radius: 12px; 
+      font-size: 0.9em; 
+      font-weight: 700;
+      cursor: pointer; 
+      color: var(--text-main); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .import-label { margin-bottom: 0; cursor: pointer; }
   </style>
 </head>
 <body data-theme="light">
@@ -148,21 +157,6 @@
     <div class="title-wrap">
       <h2>🎤 501호 오픈 마이크</h2>
       <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
-    </div>
-
-    <div class="stats-container" id="statsArea">
-      <div class="stat-card">
-        <span>누적 레슨</span>
-        <strong id="totalCount">0회</strong>
-      </div>
-      <div class="stat-card">
-        <span>이달의 연습</span>
-        <strong id="monthCount">0회</strong>
-      </div>
-      <div class="stat-card" style="grid-column: span 2;">
-        <span>가장 많이 잡은 코드 TOP 3</span>
-        <strong id="topChords">-</strong>
-      </div>
     </div>
 
     <img src="https://i.postimg.cc/rmfjc5Yn/IMG-6009.jpg" alt="메인 사진" class="main-image">
@@ -195,16 +189,16 @@
     <button id="saveBtn" onclick="saveLesson()">누가 그랬던가 잊혀져 간다는 게 일부러 그런 건 아닙디다</button>
 
     <div class="search-box" style="margin-top: 40px;">
-      <input type="text" id="searchInput" placeholder="🔍 검색어 입력..." onkeyup="renderList()">
+      <input type="text" id="searchInput" placeholder="🔍 곡명, 내용 등으로 검색..." onkeyup="renderList()">
     </div>
 
     <div id="lessonList"></div>
 
     <div class="data-management">
-      <p style="font-size: 0.8em; color: var(--text-sub);">💾 데이터 관리</p>
+      <p style="font-size: 0.85em; color: var(--text-sub); font-weight: 600;">💾 데이터 관리</p>
       <div class="data-btns">
         <button onclick="exportData()">백업</button>
-        <label for="importData" class="import-btn">복구</label>
+        <label for="importData" class="import-label">복구</label>
         <input type="file" id="importData" accept=".json" style="display:none;" onchange="importData(event)">
       </div>
     </div>
@@ -216,11 +210,11 @@
     window.onload = () => {
       initTheme();
       renderList();
-      updateStats();
-      addChordRow(); 
+      if(document.getElementById('chordInputContainer').innerHTML === "") {
+        addChordRow();
+      }
     };
 
-    // --- 테마 기능 ---
     function initTheme() {
       const savedTheme = localStorage.getItem('theme') || 'light';
       document.body.setAttribute('data-theme', savedTheme);
@@ -235,31 +229,6 @@
       document.getElementById('themeBtn').innerText = newTheme === 'light' ? '🌙' : '☀️';
     }
 
-    // --- 통계 기능 ---
-    function updateStats() {
-      const lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
-      document.getElementById('totalCount').innerText = `${lessons.length}회`;
-
-      const now = new Date();
-      const thisMonth = lessons.filter(l => {
-        const d = new Date(l.date);
-        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-      });
-      document.getElementById('monthCount').innerText = `${thisMonth.length}회`;
-
-      const chordMap = {};
-      lessons.forEach(l => {
-        if(l.chordsList) {
-          l.chordsList.forEach(c => {
-            if(c.name) chordMap[c.name] = (chordMap[c.name] || 0) + 1;
-          });
-        }
-      });
-      const sortedChords = Object.entries(chordMap).sort((a,b) => b[1] - a[1]).slice(0,3);
-      document.getElementById('topChords').innerText = sortedChords.length ? sortedChords.map(c => c[0]).join(', ') : '-';
-    }
-
-    // --- 기존 로직 유지 및 보완 ---
     function formatText(text) { return text ? text.replace(/\n/g, '<br>') : ''; }
 
     function addChordRow(nameStr = '', linkStr = '') {
@@ -304,7 +273,13 @@
       }
 
       localStorage.setItem('guitarLessons', JSON.stringify(lessons));
-      location.reload(); // 깔끔하게 새로고침으로 통계 갱신
+      renderList();
+      
+      // 입력창 초기화
+      document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
+      document.getElementById('date').value = '';
+      document.getElementById('chordInputContainer').innerHTML = '';
+      addChordRow();
     }
 
     function toggleDetails(id) {
@@ -330,6 +305,7 @@
             </div>
             <div class="record-details" id="details-${lesson.id}">
               <p><strong>📝 내용:</strong><br>${formatText(lesson.overview)}</p>
+              ${lesson.tips ? `<p><strong>💡 꿀팁:</strong><br>${formatText(lesson.tips)}</p>` : ''}
               ${lesson.chordsList && lesson.chordsList.length > 0 ? `
                 <div class="chord-grid">${lesson.chordsList.map(c => `
                   <div class="chord-card">
@@ -371,24 +347,31 @@
       if(confirm('정말 삭제할까요?')) {
         let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
         localStorage.setItem('guitarLessons', JSON.stringify(lessons.filter(l => l.id !== id)));
-        location.reload();
+        renderList();
       }
     }
 
     function exportData() {
       const data = localStorage.getItem('guitarLessons');
+      if(!data) { alert('데이터가 없습니다.'); return; }
       const blob = new Blob([data], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `guitar_backup.json`;
+      a.download = `guitar_lesson_backup.json`;
       a.click();
     }
 
     function importData(event) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        localStorage.setItem('guitarLessons', e.target.result);
-        location.reload();
+        try {
+          JSON.parse(e.target.result); // 유효성 검사
+          localStorage.setItem('guitarLessons', e.target.result);
+          renderList();
+          alert('복구가 완료되었습니다!');
+        } catch(e) {
+          alert('올바른 백업 파일이 아닙니다.');
+        }
       };
       reader.readAsText(event.target.files[0]);
     }
