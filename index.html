@@ -4,13 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>501호 오픈 마이크</title>
-  <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>501호 오픈 마이크</title>
   
-  <link rel="apple-touch-icon" href="여기에_복사한_이미지_주소를_붙여넣으세요">
-  
+  <link rel="apple-touch-icon" href="https://i.postimg.cc/C1bnY8Ln/IMG-6011.webp?v=2">
+
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
@@ -79,14 +75,13 @@
     }
     .add-row-btn:hover { background: #e5e5e5; color: #222; }
 
-    /* 코드 카드 갤러리 (사진 대신 버튼이 들어갑니다) */
+    /* 코드 카드 갤러리 */
     .chord-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; background: #fafafa; padding: 15px; border-radius: 12px; }
     .chord-card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 15px 10px; width: calc(50% - 5px); box-sizing: border-box; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02);}
     .chord-card p { margin: 0 0 10px 0; font-weight: 800; font-size: 1.1em; color: #111; }
     .chord-link-btn { display: inline-block; padding: 8px 12px; background: #f4f5f7; color: #222; text-decoration: none; border-radius: 8px; font-size: 0.85em; font-weight: 700; border: 1px solid #e1e1e1; transition: 0.2s; }
     .chord-link-btn:hover { background: #e9ecef; }
-    /* -------------------------------- */
-
+    
     #saveBtn { 
       width: 100%; padding: 16px; margin-top: 15px; background-color: #222; 
       color: white; border: none; border-radius: 14px; font-size: 1.1em; font-weight: 700; cursor: pointer; transition: 0.2s; 
@@ -129,9 +124,9 @@
     <textarea id="tips" placeholder="오늘의 핵심 팁!"></textarea>
 
     <label>🎸 새로 배운 코드 & 사진 링크</label>
-    <div id="chordInputContainer">
-      </div>
+    <div id="chordInputContainer"></div>
     <div class="add-row-btn" onclick="addChordRow()">+ 코드 칸 추가하기</div>
+
     <label>🔥 다음 주 과제</label>
     <textarea id="homework" placeholder="다음 레슨까지 해갈 일"></textarea>
 
@@ -140,8 +135,7 @@
 
     <button id="saveBtn" onclick="saveLesson()">기록 저장하기</button>
 
-    <div id="lessonList">
-      </div>
+    <div id="lessonList"></div>
   </div>
 
   <script>
@@ -157,7 +151,6 @@
       return text.replace(/\n/g, '<br>');
     }
 
-    // 코드 이름과 링크를 넣는 칸을 만듭니다
     function addChordRow(nameStr = '', linkStr = '') {
       const container = document.getElementById('chordInputContainer');
       const row = document.createElement('div');
@@ -232,7 +225,7 @@
       const container = document.getElementById('chordInputContainer');
       container.innerHTML = ''; 
       if (lesson.chordsList && lesson.chordsList.length > 0) {
-        lesson.chordsList.forEach(c => addChordRow(c.name, c.link || c.img)); // 예전 버전에 이미지 주소 넣었던 것도 호환되게 처리
+        lesson.chordsList.forEach(c => addChordRow(c.name, c.link || c.img)); 
       } else {
         addChordRow(); 
       }
@@ -267,7 +260,6 @@
             if(lesson.overview) content += `<p><strong>📝 배운 내용:</strong><br>${formatText(lesson.overview)}</p>`;
             if(lesson.tips) content += `<p><strong>💡 꿀팁 & 노하우:</strong><br>${formatText(lesson.tips)}</p>`;
             
-            // 코드 세트: 사진 대신 "🖼️ 사진 보기" 예쁜 버튼이 나옵니다!
             if(lesson.chordsList && lesson.chordsList.length > 0) {
               content += `<p><strong>🎸 새로 배운 코드:</strong></p><div class="chord-grid">`;
               lesson.chordsList.forEach(c => {
