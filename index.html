@@ -60,12 +60,29 @@
     h2 { color: var(--text-main); font-size: 1.5em; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
     label { font-weight: 600; color: var(--text-sub); font-size: 0.85em; margin-top: 20px; display: block; }
     
+    /* 👇 모든 input 박스 너비를 동일하게 고정 (날짜 박스 포함) */
     input, textarea { 
-      display: block; width: 100%; box-sizing: border-box; padding: 14px 16px; margin: 8px 0 15px 0; 
-      border: 1px solid var(--border-color); border-radius: 12px; font-size: 16px; font-family: inherit; 
-      background: var(--input-bg); color: var(--text-main); transition: 0.2s;
+      display: block; 
+      width: 100%; 
+      max-width: 100%; /* 너비 초과 방지 */
+      box-sizing: border-box; 
+      padding: 14px 16px; 
+      margin: 8px 0 15px 0; 
+      border: 1px solid var(--border-color); 
+      border-radius: 12px; 
+      font-size: 16px; 
+      font-family: inherit; 
+      background: var(--input-bg); 
+      color: var(--text-main); 
+      transition: 0.2s;
+      -webkit-appearance: none; /* 아이폰 기본 스타일 제거 */
     }
     input:focus, textarea:focus { outline: none; border-color: var(--accent-blue); }
+
+    /* 날짜 입력창 전용 스타일 (아이폰 등에서 길어지는 현상 방지) */
+    input[type="date"] {
+      min-height: 50px;
+    }
 
     .chord-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
     .chord-input-row input { margin: 0; }
@@ -75,7 +92,6 @@
       border-radius: 10px; font-size: 0.9em; font-weight: 700; cursor: pointer; margin-bottom: 15px;
     }
 
-    /* 코드 그리드 넘침 방지 핵심 수정 */
     .chord-grid { 
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; 
       margin-top: 10px; background: var(--input-bg); padding: 12px; border-radius: 12px; 
@@ -85,7 +101,7 @@
     .chord-card { 
       background: #EDA18C; border-radius: 10px; padding: 10px 4px; 
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-width: 0; overflow: hidden; /* 글자 넘침 방지 */
+      min-width: 0; overflow: hidden;
     }
     .chord-card p { 
       margin: 0; font-weight: 800; font-size: 1em; color: #ffffff !important; 
@@ -262,7 +278,7 @@
       const keyword = document.getElementById('searchInput').value.toLowerCase();
 
       lessons.filter(l => {
-        let txt = (l.date + l.song + l.overview + (l.chordsList?l.chordsList.map(c=>c.name).join(''):'')).toLowerCase();
+        let txt = (l.date + (l.song||'') + (l.overview||'') + (l.chordsList?l.chordsList.map(c=>c.name).join(''):'')).toLowerCase();
         return txt.includes(keyword);
       }).forEach(lesson => {
         let content = `
@@ -281,11 +297,8 @@
                     ${c.link ? `<a href="${c.link}" target="_blank" class="chord-link-btn">🖼️ 보기</a>` : ''}
                   </div>`).join('')}</div>` : ''}
               ${lesson.homework ? `<p style="color:#ff4d4f;"><strong>🔥 과제:</strong><br>${formatText(lesson.homework)}</p>` : ''}
-              
               ${lesson.selfNote ? `<p style="color:var(--accent-blue);"><strong>💭 나의 연습 일기:</strong><br>${formatText(lesson.selfNote)}</p>` : ''}
-              
               ${lesson.driveLink ? `<a href="${lesson.driveLink}" target="_blank" style="display:inline-block; margin-top:10px; font-size:0.85em; color:var(--accent-blue);">📁 참고 자료 링크</a>` : ''}
-
               <div class="action-btns">
                 <button class="edit-btn" onclick="editLesson(${lesson.id})">수정</button>
                 <button class="delete-btn" onclick="deleteLesson(${lesson.id})">삭제</button>
@@ -300,10 +313,10 @@
       let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
       const l = lessons.find(l => l.id === id);
       document.getElementById('date').value = l.date;
-      document.getElementById('song').value = l.song;
-      document.getElementById('overview').value = l.overview;
-      document.getElementById('tips').value = l.tips;
-      document.getElementById('homework').value = l.homework;
+      document.getElementById('song').value = l.song || '';
+      document.getElementById('overview').value = l.overview || '';
+      document.getElementById('tips').value = l.tips || '';
+      document.getElementById('homework').value = l.homework || '';
       document.getElementById('selfNote').value = l.selfNote || '';
       document.getElementById('driveLink').value = l.driveLink || '';
       
