@@ -34,44 +34,30 @@
 
     body { 
       font-family: 'Pretendard', sans-serif; 
-      margin: 0; 
-      padding: 20px; 
+      margin: 0; padding: 20px; 
       background-color: var(--bg-color); 
-      display: flex; 
-      flex-direction: column;
-      align-items: center;
-      color: var(--text-main);
-      transition: background-color 0.3s ease;
+      display: flex; flex-direction: column; align-items: center;
+      color: var(--text-main); transition: background-color 0.3s ease;
     }
 
     .app-box { 
-      width: 100%;
-      max-width: 450px; 
-      background: var(--card-bg); 
-      padding: 30px; 
-      border-radius: 24px; 
-      box-sizing: border-box; 
+      width: 100%; max-width: 450px; 
+      background: var(--card-bg); padding: 30px; 
+      border-radius: 24px; box-sizing: border-box; 
       box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
-      position: relative;
     }
 
-    .main-image {
-      width: 100%; height: 200px; object-fit: cover; border-radius: 16px; margin-bottom: 20px; 
-    }
+    .main-image { width: 100%; height: 200px; object-fit: cover; border-radius: 16px; margin-bottom: 20px; }
 
-    .title-wrap {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;
-    }
+    .title-wrap { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
     
     .theme-toggle {
-      background: var(--input-bg);
-      border: 1px solid var(--border-color);
+      background: var(--input-bg); border: 1px solid var(--border-color);
       width: 42px; height: 42px; border-radius: 12px; cursor: pointer; font-size: 1.2em;
       display: flex; align-items: center; justify-content: center; padding: 0;
     }
 
     h2 { color: var(--text-main); font-size: 1.5em; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
-    
     label { font-weight: 600; color: var(--text-sub); font-size: 0.85em; margin-top: 20px; display: block; }
     
     input, textarea { 
@@ -89,30 +75,37 @@
       border-radius: 10px; font-size: 0.9em; font-weight: 700; cursor: pointer; margin-bottom: 15px;
     }
 
+    /* 코드 그리드 넘침 방지 핵심 수정 */
     .chord-grid { 
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; 
-      margin-top: 10px; background: var(--input-bg); padding: 10px; border-radius: 12px; 
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; 
+      margin-top: 10px; background: var(--input-bg); padding: 12px; border-radius: 12px; 
+      box-sizing: border-box; width: 100%;
     }
     
     .chord-card { 
-      background: #EDA18C; border-radius: 10px; padding: 8px 4px; 
-      display: flex; flex-direction: column; align-items: center; aspect-ratio: 1 / 1; 
-      justify-content: center;
+      background: #EDA18C; border-radius: 10px; padding: 10px 4px; 
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-width: 0; overflow: hidden; /* 글자 넘침 방지 */
     }
-    .chord-card p { margin: 0; font-weight: 800; font-size: 1.1em; color: #ffffff !important; }
-    .chord-link-btn { margin-top: 6px; padding: 4px 6px; background: #ffffff; color: #EDA18C; text-decoration: none; border-radius: 6px; font-size: 0.75em; font-weight: 800; }
+    .chord-card p { 
+      margin: 0; font-weight: 800; font-size: 1em; color: #ffffff !important; 
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 90%; text-align: center;
+    }
+    .chord-link-btn { 
+      margin-top: 6px; padding: 4px 8px; background: #ffffff; color: #EDA18C; 
+      text-decoration: none; border-radius: 6px; font-size: 0.7em; font-weight: 800; 
+      white-space: nowrap;
+    }
     
     #saveBtn { 
       width: 100%; padding: 16px; margin-top: 15px; background-color: var(--primary-color); 
       color: var(--card-bg); border: none; border-radius: 14px; font-size: 1.05em; font-weight: 700; cursor: pointer;
     }
 
-    .search-box input { border: 2px solid var(--primary-color); }
-
     .record-item { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; margin-top: 15px; border-radius: 16px; }
     .record-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-    .record-header h3 { margin: 0; color: var(--text-main); font-size: 1.1em; }
-    .song-badge { font-size: 0.85em; background: var(--input-bg); color: var(--text-sub); padding: 4px 10px; border-radius: 12px; }
+    .record-header h3 { margin: 0; color: var(--text-main); font-size: 1.05em; }
+    .song-badge { font-size: 0.8em; background: var(--input-bg); color: var(--text-sub); padding: 4px 10px; border-radius: 12px; }
     
     .record-details { margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); display: none; }
     .record-item p { font-size: 0.95em; color: var(--text-main); margin: 12px 0; line-height: 1.6;}
@@ -122,33 +115,13 @@
     .edit-btn { color: var(--text-main); background: var(--input-bg); }
     .delete-btn { color: #ff4d4f; background: #fff0f0; }
 
-    /* 데이터 관리 섹션 수정 - 정렬 핵심 */
     .data-management { margin-top: 40px; padding-top: 20px; border-top: 1px dashed var(--border-color); text-align: center; }
-    .data-btns { 
-      display: flex; 
-      gap: 10px; 
-      margin-top: 15px; 
-      justify-content: center;
-      align-items: stretch; /* 높이 맞춤 */
-    }
+    .data-btns { display: flex; gap: 10px; margin-top: 15px; }
     .data-btns button, .import-label { 
-      flex: 1; 
-      height: 48px; 
-      background: var(--input-bg); 
-      border: 1px solid var(--border-color); 
-      border-radius: 12px; 
-      font-size: 0.9em; 
-      font-weight: 700;
-      cursor: pointer; 
-      color: var(--text-main); 
-      display: flex; 
-      align-items: center; 
-      justify-content: center;
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      flex: 1; height: 48px; background: var(--input-bg); border: 1px solid var(--border-color); 
+      border-radius: 12px; font-size: 0.9em; font-weight: 700; cursor: pointer; 
+      color: var(--text-main); display: flex; align-items: center; justify-content: center; margin: 0;
     }
-    .import-label { margin-bottom: 0; cursor: pointer; }
   </style>
 </head>
 <body data-theme="light">
@@ -168,28 +141,28 @@
     <input type="text" id="song" placeholder="예: 변하은 - 기지개">
 
     <label>📝 오늘 배운 내용</label>
-    <textarea id="overview" placeholder="연습 내용 요약"></textarea>
+    <textarea id="overview" placeholder="배운 기술이나 이론"></textarea>
 
     <label>💡스승님의 특급 꿀팁</label>
-    <textarea id="tips" placeholder="꿀팁을 잊지 마세요!"></textarea>
+    <textarea id="tips" placeholder="잊지 말아야 할 포인트!"></textarea>
 
     <label>🎸 새로 배운 코드</label>
     <div id="chordInputContainer"></div>
     <div class="add-row-btn" onclick="addChordRow()">+ 코드 칸 추가하기</div>
 
     <label>🔥 다음 주 과제</label>
-    <textarea id="homework" placeholder="과제를 적어주세요."></textarea>
+    <textarea id="homework" placeholder="이번 주 숙제는?"></textarea>
 
     <label>💭 나의 연습 일기 & 궁금증</label>
-    <textarea id="selfNote" placeholder="자유로운 기록..."></textarea>
+    <textarea id="selfNote" placeholder="연습하며 느낀 점, 질문 등"></textarea>
 
     <label>🔗 참고 자료 (드라이브 링크)</label>
     <input type="text" id="driveLink" placeholder="https://...">
 
     <button id="saveBtn" onclick="saveLesson()">누가 그랬던가 잊혀져 간다는 게 일부러 그런 건 아닙디다</button>
 
-    <div class="search-box" style="margin-top: 40px;">
-      <input type="text" id="searchInput" placeholder="🔍 곡명, 내용 등으로 검색..." onkeyup="renderList()">
+    <div style="margin-top: 40px;">
+      <input type="text" id="searchInput" placeholder="🔍 곡명, 내용 검색..." onkeyup="renderList()">
     </div>
 
     <div id="lessonList"></div>
@@ -210,9 +183,7 @@
     window.onload = () => {
       initTheme();
       renderList();
-      if(document.getElementById('chordInputContainer').innerHTML === "") {
-        addChordRow();
-      }
+      if(document.getElementById('chordInputContainer').innerHTML === "") addChordRow();
     };
 
     function initTheme() {
@@ -235,10 +206,8 @@
       const container = document.getElementById('chordInputContainer');
       const row = document.createElement('div');
       row.className = 'chord-input-row';
-      row.innerHTML = `
-        <input type="text" class="chord-name" placeholder="코드명" value="${nameStr}">
-        <input type="text" class="chord-link" placeholder="링크" value="${linkStr}">
-      `;
+      row.innerHTML = `<input type="text" class="chord-name" placeholder="코드명" value="${nameStr}">
+                       <input type="text" class="chord-link" placeholder="링크" value="${linkStr}">`;
       container.appendChild(row);
     }
 
@@ -251,7 +220,7 @@
       const selfNote = document.getElementById('selfNote').value;
       const driveLink = document.getElementById('driveLink').value;
 
-      if(!date || !overview) { alert('날짜와 내용은 필수입니다!'); return; }
+      if(!date || !overview) { alert('날짜와 내용은 필수!'); return; }
 
       const chordRows = document.querySelectorAll('.chord-input-row');
       let chordsList = [];
@@ -275,7 +244,6 @@
       localStorage.setItem('guitarLessons', JSON.stringify(lessons));
       renderList();
       
-      // 입력창 초기화
       document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
       document.getElementById('date').value = '';
       document.getElementById('chordInputContainer').innerHTML = '';
@@ -304,7 +272,7 @@
               ${lesson.song ? `<span class="song-badge">🎵 ${lesson.song}</span>` : ''}
             </div>
             <div class="record-details" id="details-${lesson.id}">
-              <p><strong>📝 내용:</strong><br>${formatText(lesson.overview)}</p>
+              <p><strong>📝 배운 내용:</strong><br>${formatText(lesson.overview)}</p>
               ${lesson.tips ? `<p><strong>💡 꿀팁:</strong><br>${formatText(lesson.tips)}</p>` : ''}
               ${lesson.chordsList && lesson.chordsList.length > 0 ? `
                 <div class="chord-grid">${lesson.chordsList.map(c => `
@@ -313,6 +281,11 @@
                     ${c.link ? `<a href="${c.link}" target="_blank" class="chord-link-btn">🖼️ 보기</a>` : ''}
                   </div>`).join('')}</div>` : ''}
               ${lesson.homework ? `<p style="color:#ff4d4f;"><strong>🔥 과제:</strong><br>${formatText(lesson.homework)}</p>` : ''}
+              
+              ${lesson.selfNote ? `<p style="color:var(--accent-blue);"><strong>💭 나의 연습 일기:</strong><br>${formatText(lesson.selfNote)}</p>` : ''}
+              
+              ${lesson.driveLink ? `<a href="${lesson.driveLink}" target="_blank" style="display:inline-block; margin-top:10px; font-size:0.85em; color:var(--accent-blue);">📁 참고 자료 링크</a>` : ''}
+
               <div class="action-btns">
                 <button class="edit-btn" onclick="editLesson(${lesson.id})">수정</button>
                 <button class="delete-btn" onclick="deleteLesson(${lesson.id})">삭제</button>
@@ -331,12 +304,13 @@
       document.getElementById('overview').value = l.overview;
       document.getElementById('tips').value = l.tips;
       document.getElementById('homework').value = l.homework;
-      document.getElementById('selfNote').value = l.selfNote;
-      document.getElementById('driveLink').value = l.driveLink;
+      document.getElementById('selfNote').value = l.selfNote || '';
+      document.getElementById('driveLink').value = l.driveLink || '';
       
       const container = document.getElementById('chordInputContainer');
       container.innerHTML = '';
-      l.chordsList.forEach(c => addChordRow(c.name, c.link));
+      if(l.chordsList) l.chordsList.forEach(c => addChordRow(c.name, c.link));
+      else addChordRow();
       
       editTargetId = id;
       document.getElementById('saveBtn').innerText = '✨ 수정 완료하기';
@@ -364,14 +338,9 @@
     function importData(event) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        try {
-          JSON.parse(e.target.result); // 유효성 검사
-          localStorage.setItem('guitarLessons', e.target.result);
-          renderList();
-          alert('복구가 완료되었습니다!');
-        } catch(e) {
-          alert('올바른 백업 파일이 아닙니다.');
-        }
+        localStorage.setItem('guitarLessons', e.target.result);
+        renderList();
+        alert('복구 완료!');
       };
       reader.readAsText(event.target.files[0]);
     }
