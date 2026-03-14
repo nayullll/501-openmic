@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <title>501호 오픈 마이크</title>
   
-  <link rel="apple-touch-icon" href="https://i.postimg.cc/C1bnY8Ln/IMG-6011.webp?v=2">
+  <link rel="apple-touch-icon" href="https://i.postimg.cc/C1bnY8Ln/IMG-6011.webp?v=3">
 
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -19,6 +20,7 @@
       justify-content: center; 
       color: #333;
       overflow-x: hidden;
+      overscroll-behavior-y: none; /* 👇 아이폰 기본 고무줄 효과 끄기 (충돌 방지) */
     }
 
     .app-box { 
@@ -54,7 +56,40 @@
       margin-bottom: 20px; 
     }
 
-    h2 { color: #111; text-align: center; font-size: 1.6em; font-weight: 800; margin-top: 0; letter-spacing: -0.5px; }
+    /* 👇 제목과 새로고침 버튼 나란히 배치 */
+    .title-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      margin-bottom: 5px;
+    }
+
+    h2 { color: #111; text-align: center; font-size: 1.6em; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
+    
+    /* 🔄 새로고침 버튼 디자인 */
+    .refresh-btn {
+      position: absolute;
+      right: 0;
+      background: #ffffff;
+      border: 1px solid #e1e1e1;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+    }
+    .refresh-btn:active {
+      transform: rotate(180deg) scale(0.9);
+      background: #f4f5f7;
+    }
+
     label { font-weight: 600; color: #666; font-size: 0.85em; margin-top: 20px; display: block; letter-spacing: -0.3px; }
     
     input, textarea { 
@@ -90,39 +125,12 @@
     }
     .add-row-btn:hover { background: #e5e5e5; color: #222; }
 
-    /* 👇 한 줄에 무조건 3개씩 들어가는 마법의 그리드 설정 */
-    .chord-grid { 
-      display: grid; 
-      grid-template-columns: repeat(3, 1fr); /* 1줄을 3칸으로 똑같이 나눔 */
-      gap: 10px; 
-      margin-top: 10px; 
-      background: #fafafa; 
-      padding: 15px; 
-      border-radius: 12px; 
-    }
-    
-    /* 👇 완벽한 정사각형 + 요청하신 색상 적용 */
-    .chord-card { 
-      background: #EDA18C; /* 회원님이 고르신 예쁜 오렌지빛 색상 */
-      border-radius: 12px; 
-      padding: 10px; 
-      display: flex; 
-      flex-direction: column; 
-      justify-content: center; 
-      align-items: center; 
-      box-sizing: border-box; 
-      text-align: center; 
-      box-shadow: 0 4px 10px rgba(237, 161, 140, 0.3); /* 그림자도 같은 색상톤으로! */
-      aspect-ratio: 1 / 1; /* 가로세로 비율을 1:1 정사각형으로 강제 고정 */
-    }
-    
-    /* 하얀색 글씨 적용 */
+    /* 오렌지색 3열 정사각형 코드 박스 유지! */
+    .chord-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; background: #fafafa; padding: 15px; border-radius: 12px; }
+    .chord-card { background: #EDA18C; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box; text-align: center; box-shadow: 0 4px 10px rgba(237, 161, 140, 0.3); aspect-ratio: 1 / 1; }
     .chord-card p { margin: 0; font-weight: 800; font-size: 1.2em; color: #ffffff; overflow-wrap: break-word; }
-    
-    /* 안에 들어가는 버튼은 하얀색 바탕에 오렌지색 글씨로! */
     .chord-link-btn { display: inline-block; margin-top: 8px; padding: 6px 10px; background: #ffffff; color: #EDA18C; text-decoration: none; border-radius: 8px; font-size: 0.8em; font-weight: 800; border: none; transition: 0.2s; white-space: nowrap; }
     .chord-link-btn:hover { background: #f8f8f8; }
-    /* ------------------------------------------------ */
     
     #saveBtn { 
       width: 100%; padding: 16px; margin-top: 15px; background-color: #222; 
@@ -165,7 +173,10 @@
   <div class="app-box" id="appBox">
     <img src="https://i.postimg.cc/rmfjc5Yn/IMG-6009.jpg" alt="메인 사진" class="main-image">
 
-    <h2>🎤 501호 오픈 마이크</h2>
+    <div class="title-wrap">
+      <h2>🎤 501호 오픈 마이크</h2>
+      <button class="refresh-btn" onclick="window.location.reload()">🔄</button>
+    </div>
     
     <label>📅 레슨 날짜</label>
     <input type="date" id="date">
@@ -400,7 +411,7 @@
       });
     }
 
-    // 화면 당겨서 새로고침 (Pull-to-Refresh) 엔진
+    // 👇 아이폰 고집 꺾기 (scrollY 조건을 <= 0 으로 완화했습니다)
     let startY = 0;
     let currentY = 0;
     let isPulling = false;
@@ -408,7 +419,7 @@
     const indicator = document.getElementById('pullIndicator');
 
     document.addEventListener('touchstart', function(e) {
-      if (window.scrollY === 0) {
+      if (window.scrollY <= 0) { // 여기서 아이폰 튕김을 잡아줍니다
         startY = e.touches[0].clientY;
         isPulling = true;
       }
@@ -419,7 +430,7 @@
       currentY = e.touches[0].clientY;
       let pullDistance = currentY - startY;
       
-      if (pullDistance > 0 && window.scrollY === 0) {
+      if (pullDistance > 0 && window.scrollY <= 0) {
         indicator.style.opacity = '1'; 
         let moveY = Math.min(pullDistance * 0.4, 70); 
         appBox.style.transform = `translateY(${moveY}px)`;
@@ -439,7 +450,7 @@
       isPulling = false;
       let pullDistance = currentY - startY;
       
-      if (pullDistance > 120 && window.scrollY === 0) {
+      if (pullDistance > 120 && window.scrollY <= 0) {
         appBox.style.transform = `translateY(50px)`;
         indicator.innerText = '🔄';
         setTimeout(() => window.location.reload(), 200); 
