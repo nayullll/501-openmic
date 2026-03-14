@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>501호 오픈 마이크</title>
   
-  <link rel="apple-touch-icon" href="https://i.postimg.cc/C1bnY8Ln/IMG-6011.webp?v=4">
+  <link rel="apple-touch-icon" href="https://i.postimg.cc/C1bnY8Ln/IMG-6011.webp?v=5">
 
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -20,7 +20,6 @@
       justify-content: center; 
       color: #333;
       overflow-x: hidden;
-      overscroll-behavior-y: none; 
     }
 
     .app-box { 
@@ -32,20 +31,6 @@
       box-sizing: border-box; 
       box-shadow: 0 15px 35px rgba(0,0,0,0.05); 
       position: relative;
-      z-index: 2;
-    }
-
-    .pull-indicator {
-      position: absolute;
-      top: 15px;
-      left: 0;
-      width: 100%;
-      text-align: center;
-      font-size: 1.5em;
-      color: #888;
-      z-index: 1;
-      opacity: 0;
-      transition: opacity 0.2s;
     }
 
     .main-image {
@@ -157,19 +142,21 @@
     .delete-btn { color: #ff4d4f; background: #fff0f0;}
     .delete-btn:hover { background: #ffe5e5; }
 
-    /* 👇 새롭게 추가된 데이터 백업 구역 디자인 */
+    /* 👇 백업 버튼 크기 완벽 통일! */
     .data-management { margin-top: 40px; padding-top: 20px; border-top: 1px dashed #ccc; text-align: center; }
     .data-management p { font-size: 0.85em; color: #888; margin: 0 0 12px 0; font-weight: 600; }
-    .data-btns { display: flex; justify-content: center; gap: 10px; }
+    .data-btns { display: flex; justify-content: space-between; gap: 10px; width: 100%; }
     .data-btns button, .import-btn { 
-      background: #f4f5f7; border: 1px solid #e1e1e1; padding: 10px 18px; border-radius: 10px; font-size: 0.9em; font-weight: 700; color: #444; cursor: pointer; transition: 0.2s; display: inline-block;
+      flex: 1; /* 두 버튼이 정확히 5:5 비율을 가지도록 설정 */
+      height: 48px; /* 높이를 똑같이 고정 */
+      display: flex; justify-content: center; align-items: center; box-sizing: border-box;
+      background: #f4f5f7; border: 1px solid #e1e1e1; border-radius: 10px; 
+      font-size: 0.9em; font-weight: 700; color: #444; cursor: pointer; transition: 0.2s; margin: 0; padding: 0;
     }
     .data-btns button:hover, .import-btn:hover { background: #e9ecef; color: #111; }
   </style>
 </head>
 <body>
-
-  <div class="pull-indicator" id="pullIndicator">⬇️</div>
 
   <div class="app-box" id="appBox">
     <img src="https://i.postimg.cc/rmfjc5Yn/IMG-6009.jpg" alt="메인 사진" class="main-image">
@@ -422,7 +409,6 @@
       });
     }
 
-    // 👇 [핵심 기능] 데이터 내보내기 (백업)
     function exportData() {
       const data = localStorage.getItem('guitarLessons');
       if (!data || data === '[]') {
@@ -434,13 +420,11 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      // 파일 이름은 '백업_날짜.json' 으로 만들어집니다.
       a.download = `501_openmic_backup_${new Date().toISOString().slice(0,10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
     }
 
-    // 👇 [핵심 기능] 데이터 불러오기 (복구)
     function importData(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -463,59 +447,8 @@
         }
       };
       reader.readAsText(file);
-      event.target.value = ''; // 같은 파일을 다시 열 수 있도록 초기화
+      event.target.value = ''; 
     }
-
-    // 당겨서 새로고침 기능
-    let startY = 0;
-    let currentY = 0;
-    let isPulling = false;
-    const appBox = document.getElementById('appBox');
-    const indicator = document.getElementById('pullIndicator');
-
-    document.addEventListener('touchstart', function(e) {
-      if (window.scrollY <= 0) { 
-        startY = e.touches[0].clientY;
-        isPulling = true;
-      }
-    }, { passive: true });
-
-    document.addEventListener('touchmove', function(e) {
-      if (!isPulling) return;
-      currentY = e.touches[0].clientY;
-      let pullDistance = currentY - startY;
-      
-      if (pullDistance > 0 && window.scrollY <= 0) {
-        indicator.style.opacity = '1'; 
-        let moveY = Math.min(pullDistance * 0.4, 70); 
-        appBox.style.transform = `translateY(${moveY}px)`;
-        
-        if(pullDistance > 120) {
-          indicator.innerText = '🔄';
-          indicator.style.transform = 'rotate(180deg)';
-        } else {
-          indicator.innerText = '⬇️';
-          indicator.style.transform = 'rotate(0deg)';
-        }
-      }
-    }, { passive: true });
-
-    document.addEventListener('touchend', function(e) {
-      if (!isPulling) return;
-      isPulling = false;
-      let pullDistance = currentY - startY;
-      
-      if (pullDistance > 120 && window.scrollY <= 0) {
-        appBox.style.transform = `translateY(50px)`;
-        indicator.innerText = '🔄';
-        setTimeout(() => window.location.reload(), 200); 
-      } else {
-        appBox.style.transition = 'transform 0.3s cubic-bezier(0.25, 1.5, 0.5, 1)'; 
-        appBox.style.transform = 'translateY(0)';
-        indicator.style.opacity = '0';
-        setTimeout(() => { appBox.style.transition = ''; }, 300);
-      }
-    });
   </script>
 
 </body>
