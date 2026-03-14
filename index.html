@@ -124,8 +124,7 @@
     <textarea id="overview" placeholder="sus4"></textarea>
 
     <label>💡스승님의 특급 꿀팁</label>
-    <textarea id="tips" placeholder="연습을 너무 열심히
-      해선 안된다!"></textarea>
+    <textarea id="tips" placeholder="연습을 너무 열심히 해선 안된다!"></textarea>
 
     <label>🎸 새로 배운 코드</label>
     <div id="chordInputContainer"></div>
@@ -135,7 +134,7 @@
     <textarea id="homework" placeholder="재미있다!!!"></textarea>
 
     <label>💭 나의 연습 일기 & 궁금증</label>
-    <textarea id="selfNote" placeholder="연습하며 깨달은 점, 안 되는 부분, 선생님께 물어볼 질문 등을 자유롭게 적어보세요."></textarea>
+    <textarea id="selfNote" placeholder="깨달은 점, 안 되는 부분, 스승님께 여쭤볼 질문 등을 자유롭게 적어보세요."></textarea>
 
     <label>🔗 참고 자료 (구글 드라이브 링크)</label>
     <input type="text" id="driveLink" placeholder="예: https://drive.google.com/file/d/...">
@@ -205,7 +204,7 @@
           lessons[index] = { id: editTargetId, date, song, overview, tips, chordsList, homework, selfNote, driveLink };
         }
         editTargetId = null; 
-        document.getElementById('saveBtn').innerText = '기록 저장하기'; 
+        document.getElementById('saveBtn').innerText = '누가 그랬던가 잊혀져 간다는 게 일부러 그런 건 아닙디다'; 
         document.getElementById('saveBtn').style.backgroundColor = '#222'; 
       } else {
         const lesson = { id: Date.now(), date, song, overview, tips, chordsList, homework, selfNote, driveLink };
