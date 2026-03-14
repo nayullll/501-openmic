@@ -51,14 +51,17 @@
     .chord-input-row input { margin: 0; }
     .add-row-btn { background: var(--input-bg); color: var(--text-sub); text-align: center; padding: 12px; border-radius: 10px; font-size: 0.9em; font-weight: 700; cursor: pointer; margin-bottom: 15px; }
 
-    /* 코드 도감 스타일 */
+    /* 코드 도감 업그레이드 스타일 */
     .chord-encyclopedia { margin: 20px 0; padding: 20px; background: var(--input-bg); border-radius: 16px; display: none; }
     .ency-title { font-weight: 800; font-size: 1em; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-    .ency-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-    .ency-item { background: var(--chord-orange); color: #fff; padding: 8px 4px; border-radius: 8px; font-size: 0.8em; font-weight: 700; text-align: center; }
+    .ency-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; } /* 보기 버튼을 위해 3열로 조정 */
+    .ency-item { background: var(--chord-orange); border-radius: 10px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; }
+    .ency-item p { margin: 0; font-weight: 800; font-size: 0.95em; color: #ffffff !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 90%; text-align: center; }
+    .ency-link-btn { margin-top: 6px; padding: 4px 8px; background: #ffffff; color: var(--chord-orange); text-decoration: none; border-radius: 6px; font-size: 0.7em; font-weight: 800; }
+
     .toggle-ency-btn { width: 100%; padding: 12px; background: var(--accent-blue); color: #fff; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
 
-    /* 기존 코드 그리드 */
+    /* 리스트 코드 그리드 */
     .chord-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; background: var(--input-bg); padding: 12px; border-radius: 12px; width: 100%; box-sizing: border-box; }
     .chord-card { background: var(--chord-orange); border-radius: 10px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; }
     .chord-card p { margin: 0; font-weight: 800; font-size: 1em; color: #ffffff !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 90%; text-align: center; }
@@ -174,23 +177,37 @@
       }
     }
 
+    // 도감 업데이트 로직 수정: 코드명과 가장 최근 링크를 매칭
     function updateEncyclopedia() {
       const lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
       const encyGrid = document.getElementById('encyGrid');
       const encyCount = document.getElementById('encyCount');
       
-      let allChords = new Set();
+      let chordMap = new Map(); // 코드명 -> 링크
+
+      // 레슨 리스트를 역순(최신순)으로 훑으며 코드 정보 수집
       lessons.forEach(l => {
         if(l.chordsList) {
           l.chordsList.forEach(c => {
-            if(c.name.trim()) allChords.add(c.name.trim().toUpperCase());
+            const name = c.name.trim().toUpperCase();
+            if(name && !chordMap.has(name)) {
+              chordMap.set(name, c.link || '');
+            }
           });
         }
       });
 
-      const sortedChords = Array.from(allChords).sort();
-      encyCount.innerText = `${sortedChords.length}개`;
-      encyGrid.innerHTML = sortedChords.map(name => `<div class="ency-item">${name}</div>`).join('');
+      const sortedKeys = Array.from(chordMap.keys()).sort();
+      encyCount.innerText = `${sortedKeys.length}개`;
+      
+      encyGrid.innerHTML = sortedKeys.map(name => {
+        const link = chordMap.get(name);
+        return `
+          <div class="ency-item">
+            <p>${name}</p>
+            ${link ? `<a href="${link}" target="_blank" class="ency-link-btn">🖼️ 보기</a>` : ''}
+          </div>`;
+      }).join('');
     }
 
     function addChordRow(nameStr = '', linkStr = '') {
