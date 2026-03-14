@@ -51,10 +51,10 @@
     .chord-input-row input { margin: 0; }
     .add-row-btn { background: var(--input-bg); color: var(--text-sub); text-align: center; padding: 12px; border-radius: 10px; font-size: 0.9em; font-weight: 700; cursor: pointer; margin-bottom: 15px; }
 
-    /* 코드 도감 업그레이드 스타일 */
+    /* 코드 도감 스타일 */
     .chord-encyclopedia { margin: 20px 0; padding: 20px; background: var(--input-bg); border-radius: 16px; display: none; }
     .ency-title { font-weight: 800; font-size: 1em; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-    .ency-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; } /* 보기 버튼을 위해 3열로 조정 */
+    .ency-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .ency-item { background: var(--chord-orange); border-radius: 10px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; }
     .ency-item p { margin: 0; font-weight: 800; font-size: 0.95em; color: #ffffff !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 90%; text-align: center; }
     .ency-link-btn { margin-top: 6px; padding: 4px 8px; background: #ffffff; color: var(--chord-orange); text-decoration: none; border-radius: 6px; font-size: 0.7em; font-weight: 800; }
@@ -78,8 +78,35 @@
     .edit-btn, .delete-btn { border: none; font-size: 0.85em; padding: 8px 12px; border-radius: 8px; font-weight: 600; margin-left: 5px; }
     .edit-btn { color: var(--text-main); background: var(--input-bg); }
     .delete-btn { color: #ff4d4f; background: #fff0f0; }
-    .data-btns { display: flex; gap: 10px; margin-top: 15px; }
-    .data-btns button, .import-label { flex: 1; height: 48px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; font-size: 0.9em; font-weight: 700; cursor: pointer; color: var(--text-main); display: flex; align-items: center; justify-content: center; }
+
+    /* 👇 데이터 관리 버튼 정렬 핵심 수정 */
+    .data-management { margin-top: 40px; padding-top: 20px; border-top: 1px dashed var(--border-color); text-align: center; }
+    .data-btns { 
+      display: flex; 
+      gap: 10px; 
+      margin-top: 15px; 
+      justify-content: center;
+      align-items: stretch; /* 자식 요소들의 높이를 동일하게 */
+    }
+    .data-btns button, .import-label { 
+      flex: 1; 
+      height: 48px; 
+      background: var(--input-bg); 
+      border: 1px solid var(--border-color); 
+      border-radius: 12px; 
+      font-size: 0.9em; 
+      font-weight: 700; 
+      cursor: pointer; 
+      color: var(--text-main); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      margin: 0; /* 불필요한 마진 제거 */
+      padding: 0;
+      box-sizing: border-box;
+    }
+    /* label 특유의 마진이나 정렬 문제 해결 */
+    .import-label { margin-bottom: 0 !important; cursor: pointer; }
   </style>
 </head>
 <body data-theme="light">
@@ -130,7 +157,7 @@
     <input type="text" id="searchInput" placeholder="🔍 곡명, 내용 검색..." onkeyup="renderList()" style="margin-top: 10px;">
     <div id="lessonList"></div>
 
-    <div style="margin-top: 40px; text-align: center;">
+    <div class="data-management">
       <p style="font-size: 0.85em; color: var(--text-sub); font-weight: 600;">💾 데이터 관리</p>
       <div class="data-btns">
         <button onclick="exportData()">백업</button>
@@ -177,36 +204,24 @@
       }
     }
 
-    // 도감 업데이트 로직 수정: 코드명과 가장 최근 링크를 매칭
     function updateEncyclopedia() {
       const lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
       const encyGrid = document.getElementById('encyGrid');
       const encyCount = document.getElementById('encyCount');
-      
-      let chordMap = new Map(); // 코드명 -> 링크
-
-      // 레슨 리스트를 역순(최신순)으로 훑으며 코드 정보 수집
+      let chordMap = new Map();
       lessons.forEach(l => {
         if(l.chordsList) {
           l.chordsList.forEach(c => {
             const name = c.name.trim().toUpperCase();
-            if(name && !chordMap.has(name)) {
-              chordMap.set(name, c.link || '');
-            }
+            if(name && !chordMap.has(name)) { chordMap.set(name, c.link || ''); }
           });
         }
       });
-
       const sortedKeys = Array.from(chordMap.keys()).sort();
       encyCount.innerText = `${sortedKeys.length}개`;
-      
       encyGrid.innerHTML = sortedKeys.map(name => {
         const link = chordMap.get(name);
-        return `
-          <div class="ency-item">
-            <p>${name}</p>
-            ${link ? `<a href="${link}" target="_blank" class="ency-link-btn">🖼️ 보기</a>` : ''}
-          </div>`;
+        return `<div class="ency-item"><p>${name}</p>${link ? `<a href="${link}" target="_blank" class="ency-link-btn">🖼️ 보기</a>` : ''}</div>`;
       }).join('');
     }
 
