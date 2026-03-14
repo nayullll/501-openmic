@@ -10,7 +10,6 @@
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
-    /* 화면 당길 때 부드럽게 움직이도록 배경 고정 */
     body { 
       font-family: 'Pretendard', sans-serif; 
       margin: 0; 
@@ -30,12 +29,10 @@
       border-radius: 24px; 
       box-sizing: border-box; 
       box-shadow: 0 15px 35px rgba(0,0,0,0.05); 
-      /* 👇 당길 때 쫀득하게 움직이는 효과를 위한 설정 */
       position: relative;
       z-index: 2;
     }
 
-    /* 👇 당길 때 뒤에 숨어있다가 나오는 새로고침 아이콘 */
     .pull-indicator {
       position: absolute;
       top: 15px;
@@ -93,11 +90,39 @@
     }
     .add-row-btn:hover { background: #e5e5e5; color: #222; }
 
-    .chord-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; background: #fafafa; padding: 12px; border-radius: 12px; }
-    .chord-card { background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 10px 15px; width: auto; min-width: 50px; display: inline-flex; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.02);}
-    .chord-card p { margin: 0; font-weight: 800; font-size: 1.1em; color: #111; }
-    .chord-link-btn { display: inline-block; margin-top: 8px; padding: 6px 10px; background: #f4f5f7; color: #222; text-decoration: none; border-radius: 8px; font-size: 0.8em; font-weight: 700; border: 1px solid #e1e1e1; transition: 0.2s; white-space: nowrap; }
-    .chord-link-btn:hover { background: #e9ecef; }
+    /* 👇 한 줄에 무조건 3개씩 들어가는 마법의 그리드 설정 */
+    .chord-grid { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); /* 1줄을 3칸으로 똑같이 나눔 */
+      gap: 10px; 
+      margin-top: 10px; 
+      background: #fafafa; 
+      padding: 15px; 
+      border-radius: 12px; 
+    }
+    
+    /* 👇 완벽한 정사각형 + 요청하신 색상 적용 */
+    .chord-card { 
+      background: #EDA18C; /* 회원님이 고르신 예쁜 오렌지빛 색상 */
+      border-radius: 12px; 
+      padding: 10px; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      align-items: center; 
+      box-sizing: border-box; 
+      text-align: center; 
+      box-shadow: 0 4px 10px rgba(237, 161, 140, 0.3); /* 그림자도 같은 색상톤으로! */
+      aspect-ratio: 1 / 1; /* 가로세로 비율을 1:1 정사각형으로 강제 고정 */
+    }
+    
+    /* 하얀색 글씨 적용 */
+    .chord-card p { margin: 0; font-weight: 800; font-size: 1.2em; color: #ffffff; overflow-wrap: break-word; }
+    
+    /* 안에 들어가는 버튼은 하얀색 바탕에 오렌지색 글씨로! */
+    .chord-link-btn { display: inline-block; margin-top: 8px; padding: 6px 10px; background: #ffffff; color: #EDA18C; text-decoration: none; border-radius: 8px; font-size: 0.8em; font-weight: 800; border: none; transition: 0.2s; white-space: nowrap; }
+    .chord-link-btn:hover { background: #f8f8f8; }
+    /* ------------------------------------------------ */
     
     #saveBtn { 
       width: 100%; padding: 16px; margin-top: 15px; background-color: #222; 
@@ -375,9 +400,7 @@
       });
     }
 
-    // ==========================================
-    // 👇 화면 당겨서 새로고침 (Pull-to-Refresh) 엔진!
-    // ==========================================
+    // 화면 당겨서 새로고침 (Pull-to-Refresh) 엔진
     let startY = 0;
     let currentY = 0;
     let isPulling = false;
@@ -385,7 +408,6 @@
     const indicator = document.getElementById('pullIndicator');
 
     document.addEventListener('touchstart', function(e) {
-      // 스크롤이 맨 위에 있을 때만 작동을 시작합니다.
       if (window.scrollY === 0) {
         startY = e.touches[0].clientY;
         isPulling = true;
@@ -397,14 +419,11 @@
       currentY = e.touches[0].clientY;
       let pullDistance = currentY - startY;
       
-      // 위에서 아래로 당길 때만 (거리가 0보다 클 때)
       if (pullDistance > 0 && window.scrollY === 0) {
-        indicator.style.opacity = '1'; // 숨어있던 아이콘 보여주기
-        // 고무줄처럼 쫀득하게 당겨지는 수학 공식! (최대 70px까지만 내려옴)
+        indicator.style.opacity = '1'; 
         let moveY = Math.min(pullDistance * 0.4, 70); 
         appBox.style.transform = `translateY(${moveY}px)`;
         
-        // 많이 당기면 아이콘이 빙글! 돕니다
         if(pullDistance > 120) {
           indicator.innerText = '🔄';
           indicator.style.transform = 'rotate(180deg)';
@@ -420,14 +439,12 @@
       isPulling = false;
       let pullDistance = currentY - startY;
       
-      // 충분히 길게 당겼다가 놓으면 진짜로 새로고침!
       if (pullDistance > 120 && window.scrollY === 0) {
         appBox.style.transform = `translateY(50px)`;
         indicator.innerText = '🔄';
-        setTimeout(() => window.location.reload(), 200); // 0.2초 뒤에 팟!
+        setTimeout(() => window.location.reload(), 200); 
       } else {
-        // 찔끔 당겼다가 놓으면 튕~ 하고 원래 자리로 복귀!
-        appBox.style.transition = 'transform 0.3s cubic-bezier(0.25, 1.5, 0.5, 1)'; // 젤리처럼 튕기는 효과
+        appBox.style.transition = 'transform 0.3s cubic-bezier(0.25, 1.5, 0.5, 1)'; 
         appBox.style.transform = 'translateY(0)';
         indicator.style.opacity = '0';
         setTimeout(() => { appBox.style.transition = ''; }, 300);
