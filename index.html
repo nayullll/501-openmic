@@ -74,11 +74,18 @@
     }
     .add-row-btn:hover { background: #e5e5e5; color: #222; }
 
-    .chord-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; background: #fafafa; padding: 15px; border-radius: 12px; }
-    .chord-card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 15px 10px; width: calc(50% - 5px); box-sizing: border-box; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02);}
-    .chord-card p { margin: 0 0 10px 0; font-weight: 800; font-size: 1.1em; color: #111; }
-    .chord-link-btn { display: inline-block; padding: 8px 12px; background: #f4f5f7; color: #222; text-decoration: none; border-radius: 8px; font-size: 0.85em; font-weight: 700; border: 1px solid #e1e1e1; transition: 0.2s; }
+    /* 👇 이 부분이 코드 박스 사이즈를 확 줄여주는 마법의 공간입니다 */
+    .chord-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; background: #fafafa; padding: 12px; border-radius: 12px; }
+    
+    /* width를 50%에서 auto로 바꾸고 여백을 줄여서 아주 콤팩트하게 만들었습니다! */
+    .chord-card { background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 10px 15px; width: auto; min-width: 50px; display: inline-flex; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.02);}
+    
+    /* 쓸데없이 비어있던 아래쪽 여백(margin)을 0으로 싹 없앴습니다 */
+    .chord-card p { margin: 0; font-weight: 800; font-size: 1.1em; color: #111; }
+    
+    .chord-link-btn { display: inline-block; margin-top: 8px; padding: 6px 10px; background: #f4f5f7; color: #222; text-decoration: none; border-radius: 8px; font-size: 0.8em; font-weight: 700; border: 1px solid #e1e1e1; transition: 0.2s; white-space: nowrap; }
     .chord-link-btn:hover { background: #e9ecef; }
+    /* ---------------------------------------------------- */
     
     #saveBtn { 
       width: 100%; padding: 16px; margin-top: 15px; background-color: #222; 
@@ -93,18 +100,15 @@
 
     .record-item { background: #fff; border: 1px solid #eaeaea; padding: 20px; margin-top: 15px; border-radius: 16px; position: relative; }
     
-    /* 👇 아코디언 관련 디자인 추가 */
     .record-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
     .record-header-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .record-header h3 { margin: 0; color: #111; font-size: 1.1em; font-weight: 800; }
     .record-header .song-badge { font-size: 0.85em; background: #f0f0f0; color: #555; padding: 4px 10px; border-radius: 12px; font-weight: 600; }
     .toggle-icon { font-size: 0.8em; color: #888; transition: transform 0.3s ease; }
-    .toggle-icon.open { transform: rotate(180deg); } /* 열리면 화살표 뒤집기 */
+    .toggle-icon.open { transform: rotate(180deg); } 
     
-    /* 내용 부분은 처음엔 숨겨둡니다 */
     .record-details { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee; display: none; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-    /* ------------------------------ */
 
     .record-item p { font-size: 0.95em; color: #333; margin: 12px 0; line-height: 1.6;}
     .link-btn { display: inline-block; margin-top: 12px; padding: 10px 18px; background: #f4f5f7; color: #222; text-decoration: none; border-radius: 10px; font-size: 0.9em; font-weight: 700; border: 1px solid #e1e1e1;}
@@ -269,7 +273,6 @@
       }
     }
 
-    // 👇 기록을 열고 닫는 마법의 스위치 함수
     function toggleDetails(id) {
       const details = document.getElementById(`details-${id}`);
       const icon = document.getElementById(`icon-${id}`);
@@ -309,7 +312,6 @@
       }
 
       filteredLessons.forEach(lesson => {
-        // 👇 터치하면 열리도록 onclick 구조 변경
         let content = `<div class="record-item">
             <div class="record-header" onclick="toggleDetails(${lesson.id})">
               <div class="record-header-left">
@@ -352,9 +354,9 @@
               <button class="edit-btn" onclick="editLesson(${lesson.id}); toggleDetails(${lesson.id});">수정</button>
               <button class="delete-btn" onclick="deleteLesson(${lesson.id})">삭제</button>
             </div>
-          </div>`; // record-details 닫기
+          </div>`; 
             
-        content += `</div>`; // record-item 닫기
+        content += `</div>`; 
         list.innerHTML += content;
       });
     }
