@@ -150,26 +150,26 @@
 
     <img src="https://i.postimg.cc/rmfjc5Yn/IMG-6009.jpg" alt="메인 사진" class="main-image">
 
-    <label>📅 레슨 날짜</label>
+    <label>📅 날짜</label>
     <input type="date" id="date">
 
     <label>🎵 곡명 (연습곡)</label>
     <input type="text" id="song" placeholder="예: 변하은 - 기지개">
 
     <label>📝 오늘 배운 내용</label>
-    <textarea id="overview" placeholder="배운 기술이나 이론"></textarea>
+    <textarea id="overview" placeholder="해머링"></textarea>
 
     <label>💡스승님의 특급 꿀팁</label>
-    <textarea id="tips" placeholder="잊지 말아야 할 포인트!"></textarea>
+    <textarea id="tips" placeholder="연습을 너무 열심히 해선 안된다!"></textarea>
 
     <label>🎸 새로 배운 코드</label>
     <div id="chordInputContainer"></div>
     <div class="add-row-btn" onclick="addChordRow()">+ 코드 칸 추가하기</div>
 
     <label>🔥 다음 주 과제</label>
-    <textarea id="homework" placeholder="이번 주 숙제는?"></textarea>
+    <textarea id="homework" placeholder="재미있어!!!"></textarea>
 
-    <label>💭 나의 연습 일기 & 궁금증</label>
+    <label>💭 연습 일기 & 궁금증</label>
     <textarea id="selfNote" placeholder="연습하며 느낀 점, 질문 등"></textarea>
 
     <label>🔗 참고 자료 (드라이브 링크)</label>
@@ -289,7 +289,7 @@
             </div>
             <div class="record-details" id="details-${lesson.id}">
               <p><strong>📝 배운 내용:</strong><br>${formatText(lesson.overview)}</p>
-              ${lesson.tips ? `<p><strong>💡 꿀팁:</strong><br>${formatText(lesson.tips)}</p>` : ''}
+              ${lesson.tips ? `<p><strong>💡 스승님 꿀팁:</strong><br>${formatText(lesson.tips)}</p>` : ''}
               ${lesson.chordsList && lesson.chordsList.length > 0 ? `
                 <div class="chord-grid">${lesson.chordsList.map(c => `
                   <div class="chord-card">
