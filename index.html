@@ -80,9 +80,11 @@
     .chord-link-btn { display: inline-block; padding: 8px 12px; background: #f4f5f7; color: #222; text-decoration: none; border-radius: 8px; font-size: 0.85em; font-weight: 700; border: 1px solid #e1e1e1; transition: 0.2s; }
     .chord-link-btn:hover { background: #e9ecef; }
     
+    /* 👇 문구가 길어져서 줄바꿈이 될 때도 예쁘게 나오도록 줄간격을 조금 늘렸습니다 */
     #saveBtn { 
       width: 100%; padding: 16px; margin-top: 15px; background-color: #222; 
-      color: white; border: none; border-radius: 14px; font-size: 1.1em; font-weight: 700; cursor: pointer; transition: 0.2s; 
+      color: white; border: none; border-radius: 14px; font-size: 1.05em; font-weight: 700; cursor: pointer; transition: 0.2s; 
+      line-height: 1.4; word-break: keep-all;
     }
     #saveBtn:hover { background-color: #444; }
 
@@ -139,7 +141,7 @@
     <label>🔗 참고 자료 (구글 드라이브 링크)</label>
     <input type="text" id="driveLink" placeholder="예: https://drive.google.com/file/d/...">
 
-    <button id="saveBtn" onclick="saveLesson()">기록 저장하기</button>
+    <button id="saveBtn" onclick="saveLesson()">누가 그랬던가 잊혀져 간다는 게 일부러 그런 건 아닙디다</button>
 
     <div class="search-box">
       <input type="text" id="searchInput" placeholder="🔍 곡명, 내용, 코드 등으로 검색..." onkeyup="renderList()">
@@ -178,7 +180,7 @@
       const overview = document.getElementById('overview').value;
       const tips = document.getElementById('tips').value;
       const homework = document.getElementById('homework').value;
-      const selfNote = document.getElementById('selfNote').value; // 새 기능 저장!
+      const selfNote = document.getElementById('selfNote').value;
       const driveLink = document.getElementById('driveLink').value;
 
       if(!date || !overview) {
@@ -204,6 +206,7 @@
           lessons[index] = { id: editTargetId, date, song, overview, tips, chordsList, homework, selfNote, driveLink };
         }
         editTargetId = null; 
+        // 👇 이 부분은 이미 완벽하게 수정해 두셨더라고요!
         document.getElementById('saveBtn').innerText = '누가 그랬던가 잊혀져 간다는 게 일부러 그런 건 아닙디다'; 
         document.getElementById('saveBtn').style.backgroundColor = '#222'; 
       } else {
@@ -231,7 +234,7 @@
       document.getElementById('overview').value = lesson.overview || '';
       document.getElementById('tips').value = lesson.tips || '';
       document.getElementById('homework').value = lesson.homework || '';
-      document.getElementById('selfNote').value = lesson.selfNote || ''; // 새 기능 불러오기!
+      document.getElementById('selfNote').value = lesson.selfNote || ''; 
       document.getElementById('driveLink').value = lesson.driveLink || '';
 
       const container = document.getElementById('chordInputContainer');
@@ -264,11 +267,9 @@
       list.innerHTML = '';
       let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
 
-      // 👇 검색창에 입력한 글자 가져오기
       const searchInput = document.getElementById('searchInput');
       const keyword = searchInput ? searchInput.value.toLowerCase() : '';
 
-      // 👇 검색어에 맞는 기록만 골라내기 (필터링)
       const filteredLessons = lessons.filter(lesson => {
         if(!keyword) return true;
         
@@ -281,7 +282,6 @@
         return searchText.toLowerCase().includes(keyword);
       });
 
-      // 검색 결과가 없을 때 보여주는 메시지
       if(filteredLessons.length === 0 && keyword !== '') {
         list.innerHTML = `<p style="text-align:center; color:#888; margin-top:30px; font-weight:600;">"${keyword}"에 대한 기록이 없어요! 🎸</p>`;
         return;
@@ -313,7 +313,6 @@
             
             if(lesson.homework) content += `<p style="color:#ff4d4f;"><strong>🔥 과제:</strong><br>${formatText(lesson.homework)}</p>`;
             
-            // 👇 연습 일기가 예쁜 파란색으로 화면에 뜹니다!
             if(lesson.selfNote) content += `<p style="color:#1976D2;"><strong>💭 나의 연습 일기:</strong><br>${formatText(lesson.selfNote)}</p>`;
             
             if(lesson.driveLink) content += `<a href="${lesson.driveLink}" target="_blank" class="link-btn">📁 자료 보기</a>`;
