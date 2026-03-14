@@ -27,7 +27,6 @@
       box-shadow: 0 15px 35px rgba(0,0,0,0.05); 
     }
 
-    /* 메인 상단 사진 */
     .main-image {
       width: 100%;
       height: 200px; 
@@ -56,21 +55,33 @@
       appearance: none;
       transition: 0.2s;
     }
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: #222; 
-      background: #fff;
-    }
+    input:focus, textarea:focus { outline: none; border-color: #222; background: #fff; }
     input { height: 50px; } 
-    /* 여러 줄을 쓸 수 있도록 입력칸 높이를 넉넉하게 잡았습니다 */
     textarea { height: 100px; resize: none; line-height: 1.5; }
 
+    /* 👇 새롭게 추가된 코드 묶음 디자인 */
+    .chord-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .chord-input-row input { margin: 0; }
+    .chord-input-row .chord-name { flex: 1; } /* 이름칸 비율 */
+    .chord-input-row .chord-img { flex: 2; } /* 주소칸 비율 (조금 더 넓게) */
+    
+    .add-row-btn {
+      background: #f0f0f0; color: #555; text-align: center; padding: 12px; 
+      border-radius: 10px; font-size: 0.9em; font-weight: 700; cursor: pointer; 
+      margin-top: 5px; margin-bottom: 15px; transition: 0.2s;
+    }
+    .add-row-btn:hover { background: #e5e5e5; color: #222; }
+
+    /* 화면에 예쁘게 나오는 코드 갤러리 */
+    .chord-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; background: #fafafa; padding: 15px; border-radius: 12px; }
+    .chord-card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 10px; width: calc(50% - 5px); box-sizing: border-box; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02);}
+    .chord-card img { width: 100%; height: 90px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; }
+    .chord-card p { margin: 0; font-weight: 700; font-size: 1em; color: #111; }
+    /* -------------------------------- */
+
     #saveBtn { 
-      width: 100%; padding: 16px; margin-top: 15px;
-      background-color: #222; 
-      color: white; border: none; 
-      border-radius: 14px; font-size: 1.1em; font-weight: 700; cursor: pointer; 
-      transition: 0.2s; 
+      width: 100%; padding: 16px; margin-top: 15px; background-color: #222; 
+      color: white; border: none; border-radius: 14px; font-size: 1.1em; font-weight: 700; cursor: pointer; transition: 0.2s; 
     }
     #saveBtn:hover { background-color: #444; }
 
@@ -79,21 +90,11 @@
     .record-item h4 { margin-top: 0; color: #555; font-size: 1em; font-weight: 600; margin-bottom: 15px;}
     .record-item p { font-size: 0.95em; color: #333; margin: 12px 0; line-height: 1.6;}
     
-    /* 첨부된 코드 사진 디자인 */
-    .chord-img-view { width: 100%; border-radius: 12px; margin-top: 10px; border: 1px solid #eee; }
-    
     .link-btn { display: inline-block; margin-top: 12px; padding: 10px 18px; background: #f4f5f7; color: #222; text-decoration: none; border-radius: 10px; font-size: 0.9em; font-weight: 700; border: 1px solid #e1e1e1;}
     .link-btn:hover { background: #e9ecef; }
 
-    .action-btns {
-      margin-top: 20px;
-      text-align: right;
-      border-top: 1px solid #f0f0f0;
-      padding-top: 15px;
-    }
-    .edit-btn, .delete-btn {
-      background: none; border: none; font-size: 0.85em; cursor: pointer; padding: 6px 12px; border-radius: 8px; font-weight: 600; margin-left: 5px;
-    }
+    .action-btns { margin-top: 20px; text-align: right; border-top: 1px solid #f0f0f0; padding-top: 15px; }
+    .edit-btn, .delete-btn { background: none; border: none; font-size: 0.85em; cursor: pointer; padding: 6px 12px; border-radius: 8px; font-weight: 600; margin-left: 5px; }
     .edit-btn { color: #555; background: #f4f5f7;}
     .edit-btn:hover { background: #e9ecef; }
     .delete-btn { color: #ff4d4f; background: #fff0f0;}
@@ -114,19 +115,17 @@
     <input type="text" id="song" placeholder="예: 변하은 - 기지개">
 
     <label>📝 오늘 배운 내용</label>
-    <textarea id="overview" placeholder="예: 아르페지오 주법 기초&#10;자세 교정 등 편하게 엔터 치며 적으세요"></textarea>
+    <textarea id="overview" placeholder="엔터 치면서 편하게 적으세요"></textarea>
 
-    <label>💡스승님의 가르침</label>
-    <textarea id="tips" placeholder="예: 엄지손가락에 힘 빼기&#10;자연스럽게 튕기기"></textarea>
+    <label>💡 선생님의 꿀팁 & 노하우</label>
+    <textarea id="tips" placeholder="오늘의 핵심 팁!"></textarea>
 
-    <label>🎸 새로 배운 코드</label>
-    <textarea id="chords" placeholder="예: F코드, Bm7 등 여러 개 작성 가능"></textarea>
-
-    <label>📸 새로 배운 코드 사진 (사진 주소 붙여넣기)</label>
-    <input type="text" id="chordImage" placeholder="예: https://i.postimg.cc/.../chord.jpg">
-
+    <label>🎸 새로 배운 코드 & 사진</label>
+    <div id="chordInputContainer">
+      </div>
+    <div class="add-row-btn" onclick="addChordRow()">+ 코드 칸 추가하기</div>
     <label>🔥 다음 주 과제</label>
-    <textarea id="homework" placeholder="예: 메트로놈 80에 맞춰 1절 완곡하기"></textarea>
+    <textarea id="homework" placeholder="다음 레슨까지 해갈 일"></textarea>
 
     <label>🔗 참고 자료 (구글 드라이브 링크)</label>
     <input type="text" id="driveLink" placeholder="예: https://drive.google.com/file/d/...">
@@ -140,12 +139,26 @@
   <script>
     let editTargetId = null; 
 
-    window.onload = renderList;
+    window.onload = () => {
+      renderList();
+      addChordRow(); // 화면이 열리면 기본으로 코드 1칸을 깔아줍니다.
+    };
 
-    // 엔터(줄바꿈)를 화면에 그대로 보여주기 위한 마법의 함수
     function formatText(text) {
       if (!text) return '';
       return text.replace(/\n/g, '<br>');
+    }
+
+    // 코드 입력칸을 한 줄씩 만들어주는 기능
+    function addChordRow(nameStr = '', imgStr = '') {
+      const container = document.getElementById('chordInputContainer');
+      const row = document.createElement('div');
+      row.className = 'chord-input-row';
+      row.innerHTML = `
+        <input type="text" class="chord-name" placeholder="코드명(F)" value="${nameStr}">
+        <input type="text" class="chord-img" placeholder="사진 주소" value="${imgStr}">
+      `;
+      container.appendChild(row);
     }
 
     function saveLesson() {
@@ -153,8 +166,6 @@
       const song = document.getElementById('song').value;
       const overview = document.getElementById('overview').value;
       const tips = document.getElementById('tips').value;
-      const chords = document.getElementById('chords').value;
-      const chordImage = document.getElementById('chordImage').value; // 새 사진 기능 추가!
       const homework = document.getElementById('homework').value;
       const driveLink = document.getElementById('driveLink').value;
 
@@ -163,27 +174,39 @@
         return;
       }
 
+      // 작성한 여러 개의 코드를 하나씩 수집해서 가방(배열)에 담기
+      const chordRows = document.querySelectorAll('.chord-input-row');
+      let chordsList = [];
+      chordRows.forEach(row => {
+        const name = row.querySelector('.chord-name').value;
+        const img = row.querySelector('.chord-img').value;
+        if (name || img) {
+          chordsList.push({ name: name, img: img });
+        }
+      });
+
       let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
 
       if (editTargetId) {
         const index = lessons.findIndex(lesson => lesson.id === editTargetId);
         if (index !== -1) {
-          lessons[index] = { id: editTargetId, date, song, overview, tips, chords, chordImage, homework, driveLink };
+          lessons[index] = { id: editTargetId, date, song, overview, tips, chordsList, homework, driveLink };
         }
         editTargetId = null; 
         document.getElementById('saveBtn').innerText = '기록 저장하기'; 
         document.getElementById('saveBtn').style.backgroundColor = '#222'; 
       } else {
-        const lesson = { id: Date.now(), date, song, overview, tips, chords, chordImage, homework, driveLink };
+        const lesson = { id: Date.now(), date, song, overview, tips, chordsList, homework, driveLink };
         lessons.unshift(lesson); 
       }
 
       localStorage.setItem('guitarLessons', JSON.stringify(lessons));
       
-      document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
+      // 입력칸들 다시 텅 빈 상태로 초기화
+      document.querySelectorAll('input[type="text"]:not(.chord-name):not(.chord-img), textarea').forEach(el => el.value = '');
       document.getElementById('date').value = '';
-      document.getElementById('chordImage').value = '';
-      document.getElementById('driveLink').value = '';
+      document.getElementById('chordInputContainer').innerHTML = ''; // 코드 칸들 싹 지우고
+      addChordRow(); // 깨끗한 새 칸 1개만 다시 만들기
       
       renderList();
     }
@@ -197,13 +220,19 @@
       document.getElementById('song').value = lesson.song || '';
       document.getElementById('overview').value = lesson.overview || '';
       document.getElementById('tips').value = lesson.tips || '';
-      document.getElementById('chords').value = lesson.chords || '';
-      document.getElementById('chordImage').value = lesson.chordImage || '';
       document.getElementById('homework').value = lesson.homework || '';
       document.getElementById('driveLink').value = lesson.driveLink || '';
 
+      // 저장되어 있던 코드 목록들을 화면에 쫙 깔아주기
+      const container = document.getElementById('chordInputContainer');
+      container.innerHTML = ''; 
+      if (lesson.chordsList && lesson.chordsList.length > 0) {
+        lesson.chordsList.forEach(c => addChordRow(c.name, c.img));
+      } else {
+        addChordRow(); // 옛날 기록이라 코드가 없으면 빈칸 1개
+      }
+
       editTargetId = id; 
-      
       const saveBtn = document.getElementById('saveBtn');
       saveBtn.innerText = '✨ 수정 완료하기';
       saveBtn.style.backgroundColor = '#1976D2'; 
@@ -232,10 +261,22 @@
             if(lesson.song) content += `<h4>🎵 ${lesson.song}</h4>`;
             if(lesson.overview) content += `<p><strong>📝 배운 내용:</strong><br>${formatText(lesson.overview)}</p>`;
             if(lesson.tips) content += `<p><strong>💡 꿀팁 & 노하우:</strong><br>${formatText(lesson.tips)}</p>`;
-            if(lesson.chords) content += `<p><strong>🎸 코드:</strong><br>${formatText(lesson.chords)}</p>`;
             
-            // 코드 사진 주소가 있으면 사진 띄워주기!
-            if(lesson.chordImage) content += `<img src="${lesson.chordImage}" class="chord-img-view" alt="코드 사진">`;
+            // 저장된 코드 세트가 있으면 예쁜 갤러리 카드로 보여주기!
+            if(lesson.chordsList && lesson.chordsList.length > 0) {
+              content += `<p><strong>🎸 새로 배운 코드:</strong></p><div class="chord-grid">`;
+              lesson.chordsList.forEach(c => {
+                content += `<div class="chord-card">`;
+                // 사진 주소가 있으면 사진 띄우고, 없으면 글자만!
+                if(c.img) content += `<img src="${c.img}" alt="${c.name}">`;
+                if(c.name) content += `<p>${c.name}</p>`;
+                content += `</div>`;
+              });
+              content += `</div>`;
+            } else if (lesson.chords) { 
+              // 아주 예전에 작성했던 구버전 기록 호환용
+              content += `<p><strong>🎸 코드:</strong><br>${formatText(lesson.chords)}</p>`;
+            }
             
             if(lesson.homework) content += `<p style="color:#ff4d4f;"><strong>🔥 과제:</strong><br>${formatText(lesson.homework)}</p>`;
             if(lesson.driveLink) content += `<a href="${lesson.driveLink}" target="_blank" class="link-btn">📁 자료 보기</a>`;
