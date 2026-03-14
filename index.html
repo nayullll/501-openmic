@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>501호 오픈 마이크</title>
   
-  <link rel="apple-touch-icon" href="https://i.postimg.cc/C1bnY8Ln/IMG-6011.webp?v=5">
+  <link rel="apple-touch-icon" href="https://i.postimg.cc/C1bnY8Ln/IMG-6011.webp?v=6">
 
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -105,9 +105,46 @@
     }
     .add-row-btn:hover { background: #e5e5e5; color: #222; }
 
-    .chord-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; background: #fafafa; padding: 15px; border-radius: 12px; }
-    .chord-card { background: #EDA18C; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box; text-align: center; box-shadow: 0 4px 10px rgba(237, 161, 140, 0.3); aspect-ratio: 1 / 1; }
-    .chord-card p { margin: 0; font-weight: 800; font-size: 1.2em; color: #ffffff; overflow-wrap: break-word; }
+    /* 👇 [레이아웃 수정] 박스들이 컨테이너 내에 머물도록 중앙 정렬 및 너비 제한 추가 */
+    .chord-grid { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); 
+      gap: 8px; /* gap을 조금 더 줄여서 컨테이너 내 공간 확보 */
+      margin-top: 10px; 
+      background: #fafafa; 
+      padding: 12px; 
+      border-radius: 12px; 
+      justify-content: center;
+      justify-items: center;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    /* 👇 [레이아웃 수정] 박스들이 컨테이너 너비를 넘지 않도록 max-width 설정 추가 */
+    .chord-card { 
+      background: #EDA18C; 
+      border-radius: 12px; 
+      padding: 8px 5px; /* 패딩을 조금 더 줄여서 컨테이너 내 공간 확보 */
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      align-items: center; 
+      box-sizing: border-box; 
+      text-align: center; 
+      box-shadow: 0 4px 10px rgba(237, 161, 140, 0.3); 
+      aspect-ratio: 1 / 1; 
+      max-width: 100%;
+    }
+    
+    /* 👇 [색상 수정] 사용자가 요청한 하얀색으로 코드명 텍스트 색상 변경 */
+    .chord-card p { 
+      margin: 0; 
+      font-weight: 800; 
+      font-size: 1.1em; /* 텍스트 크기를 살짝 줄여서 박스 내 여유 공간 확보 */
+      color: #ffffff; 
+      overflow-wrap: break-word; 
+    }
+    
     .chord-link-btn { display: inline-block; margin-top: 8px; padding: 6px 10px; background: #ffffff; color: #EDA18C; text-decoration: none; border-radius: 8px; font-size: 0.8em; font-weight: 800; border: none; transition: 0.2s; white-space: nowrap; }
     .chord-link-btn:hover { background: #f8f8f8; }
     
@@ -142,13 +179,12 @@
     .delete-btn { color: #ff4d4f; background: #fff0f0;}
     .delete-btn:hover { background: #ffe5e5; }
 
-    /* 👇 백업 버튼 크기 완벽 통일! */
     .data-management { margin-top: 40px; padding-top: 20px; border-top: 1px dashed #ccc; text-align: center; }
     .data-management p { font-size: 0.85em; color: #888; margin: 0 0 12px 0; font-weight: 600; }
     .data-btns { display: flex; justify-content: space-between; gap: 10px; width: 100%; }
     .data-btns button, .import-btn { 
-      flex: 1; /* 두 버튼이 정확히 5:5 비율을 가지도록 설정 */
-      height: 48px; /* 높이를 똑같이 고정 */
+      flex: 1; 
+      height: 48px; 
       display: flex; justify-content: center; align-items: center; box-sizing: border-box;
       background: #f4f5f7; border: 1px solid #e1e1e1; border-radius: 10px; 
       font-size: 0.9em; font-weight: 700; color: #444; cursor: pointer; transition: 0.2s; margin: 0; padding: 0;
@@ -266,7 +302,7 @@
           lessons[index] = { id: editTargetId, date, song, overview, tips, chordsList, homework, selfNote, driveLink };
         }
         editTargetId = null; 
-        document.getElementById('saveBtn').innerText = '누가 그랬던가 잊혀져 간다는 게 일부러 그런 건 아닙디다'; 
+        document.getElementById('saveBtn').innerText = '누가 그랬던가 잊혀져 간다는 게 일부러 건 아닙디다'; 
         document.getElementById('saveBtn').style.backgroundColor = '#222'; 
       } else {
         const lesson = { id: Date.now(), date, song, overview, tips, chordsList, homework, selfNote, driveLink };
