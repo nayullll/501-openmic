@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>501호 오픈 마이크</title>
   
-  <link rel="apple-touch-icon" href="https://i.postimg.cc/C1bnY8Ln/IMG-6011.webp?v=3">
+  <link rel="apple-touch-icon" href="https://i.postimg.cc/C1bnY8Ln/IMG-6011.webp?v=4">
 
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -20,7 +20,7 @@
       justify-content: center; 
       color: #333;
       overflow-x: hidden;
-      overscroll-behavior-y: none; /* 👇 아이폰 기본 고무줄 효과 끄기 (충돌 방지) */
+      overscroll-behavior-y: none; 
     }
 
     .app-box { 
@@ -56,7 +56,6 @@
       margin-bottom: 20px; 
     }
 
-    /* 👇 제목과 새로고침 버튼 나란히 배치 */
     .title-wrap {
       display: flex;
       justify-content: center;
@@ -67,7 +66,6 @@
 
     h2 { color: #111; text-align: center; font-size: 1.6em; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
     
-    /* 🔄 새로고침 버튼 디자인 */
     .refresh-btn {
       position: absolute;
       right: 0;
@@ -85,10 +83,7 @@
       align-items: center;
       padding: 0;
     }
-    .refresh-btn:active {
-      transform: rotate(180deg) scale(0.9);
-      background: #f4f5f7;
-    }
+    .refresh-btn:active { transform: rotate(180deg) scale(0.9); background: #f4f5f7; }
 
     label { font-weight: 600; color: #666; font-size: 0.85em; margin-top: 20px; display: block; letter-spacing: -0.3px; }
     
@@ -125,7 +120,6 @@
     }
     .add-row-btn:hover { background: #e5e5e5; color: #222; }
 
-    /* 오렌지색 3열 정사각형 코드 박스 유지! */
     .chord-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; background: #fafafa; padding: 15px; border-radius: 12px; }
     .chord-card { background: #EDA18C; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box; text-align: center; box-shadow: 0 4px 10px rgba(237, 161, 140, 0.3); aspect-ratio: 1 / 1; }
     .chord-card p { margin: 0; font-weight: 800; font-size: 1.2em; color: #ffffff; overflow-wrap: break-word; }
@@ -144,14 +138,12 @@
     .search-box input:focus { border-color: #1976D2; box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.1); }
 
     .record-item { background: #fff; border: 1px solid #eaeaea; padding: 20px; margin-top: 15px; border-radius: 16px; position: relative; }
-    
     .record-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
     .record-header-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .record-header h3 { margin: 0; color: #111; font-size: 1.1em; font-weight: 800; }
     .record-header .song-badge { font-size: 0.85em; background: #f0f0f0; color: #555; padding: 4px 10px; border-radius: 12px; font-weight: 600; }
     .toggle-icon { font-size: 0.8em; color: #888; transition: transform 0.3s ease; }
     .toggle-icon.open { transform: rotate(180deg); } 
-    
     .record-details { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee; display: none; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -164,6 +156,15 @@
     .edit-btn:hover { background: #e9ecef; }
     .delete-btn { color: #ff4d4f; background: #fff0f0;}
     .delete-btn:hover { background: #ffe5e5; }
+
+    /* 👇 새롭게 추가된 데이터 백업 구역 디자인 */
+    .data-management { margin-top: 40px; padding-top: 20px; border-top: 1px dashed #ccc; text-align: center; }
+    .data-management p { font-size: 0.85em; color: #888; margin: 0 0 12px 0; font-weight: 600; }
+    .data-btns { display: flex; justify-content: center; gap: 10px; }
+    .data-btns button, .import-btn { 
+      background: #f4f5f7; border: 1px solid #e1e1e1; padding: 10px 18px; border-radius: 10px; font-size: 0.9em; font-weight: 700; color: #444; cursor: pointer; transition: 0.2s; display: inline-block;
+    }
+    .data-btns button:hover, .import-btn:hover { background: #e9ecef; color: #111; }
   </style>
 </head>
 <body>
@@ -210,6 +211,16 @@
     </div>
 
     <div id="lessonList"></div>
+
+    <div class="data-management">
+      <p>💾 기록이 날아갈까 걱정된다면?</p>
+      <div class="data-btns">
+        <button onclick="exportData()">내보내기 (백업)</button>
+        <label for="importData" class="import-btn">불러오기 (복구)</label>
+        <input type="file" id="importData" accept=".json" style="display:none;" onchange="importData(event)">
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -411,7 +422,51 @@
       });
     }
 
-    // 👇 아이폰 고집 꺾기 (scrollY 조건을 <= 0 으로 완화했습니다)
+    // 👇 [핵심 기능] 데이터 내보내기 (백업)
+    function exportData() {
+      const data = localStorage.getItem('guitarLessons');
+      if (!data || data === '[]') {
+        alert('아직 저장된 기록이 없습니다!');
+        return;
+      }
+      
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      // 파일 이름은 '백업_날짜.json' 으로 만들어집니다.
+      a.download = `501_openmic_backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // 👇 [핵심 기능] 데이터 불러오기 (복구)
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const importedLessons = JSON.parse(e.target.result);
+          if (Array.isArray(importedLessons)) {
+            if(confirm('기록을 복구하시겠습니까? (현재 화면에 있는 기록과 교체됩니다)')) {
+               localStorage.setItem('guitarLessons', JSON.stringify(importedLessons));
+               renderList();
+               alert('🎉 기록 복구가 완료되었습니다!');
+            }
+          } else {
+            alert('잘못된 백업 파일입니다.');
+          }
+        } catch (err) {
+          alert('파일을 읽는 중 오류가 발생했습니다.');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = ''; // 같은 파일을 다시 열 수 있도록 초기화
+    }
+
+    // 당겨서 새로고침 기능
     let startY = 0;
     let currentY = 0;
     let isPulling = false;
@@ -419,7 +474,7 @@
     const indicator = document.getElementById('pullIndicator');
 
     document.addEventListener('touchstart', function(e) {
-      if (window.scrollY <= 0) { // 여기서 아이폰 튕김을 잡아줍니다
+      if (window.scrollY <= 0) { 
         startY = e.touches[0].clientY;
         isPulling = true;
       }
