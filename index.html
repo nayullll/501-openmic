@@ -62,7 +62,6 @@
     input { height: 50px; } 
     textarea { height: 100px; resize: none; line-height: 1.5; }
 
-    /* 코드 이름 & 링크 입력칸 */
     .chord-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
     .chord-input-row input { margin: 0; }
     .chord-input-row .chord-name { flex: 1; } 
@@ -75,7 +74,6 @@
     }
     .add-row-btn:hover { background: #e5e5e5; color: #222; }
 
-    /* 코드 카드 갤러리 */
     .chord-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; background: #fafafa; padding: 15px; border-radius: 12px; }
     .chord-card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 15px 10px; width: calc(50% - 5px); box-sizing: border-box; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02);}
     .chord-card p { margin: 0 0 10px 0; font-weight: 800; font-size: 1.1em; color: #111; }
@@ -87,6 +85,11 @@
       color: white; border: none; border-radius: 14px; font-size: 1.1em; font-weight: 700; cursor: pointer; transition: 0.2s; 
     }
     #saveBtn:hover { background-color: #444; }
+
+    /* 실시간 검색창 디자인 */
+    .search-box { margin-top: 40px; margin-bottom: 15px; position: relative; }
+    .search-box input { background: #fff; border: 2px solid #222; font-weight: 600; }
+    .search-box input:focus { border-color: #1976D2; box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.1); }
 
     .record-item { background: #fff; border: 1px solid #eaeaea; padding: 20px; margin-top: 20px; border-radius: 16px; position: relative;}
     .record-item h3 { margin-top: 0; color: #111; font-size: 1.2em; font-weight: 800; margin-bottom: 5px;}
@@ -118,22 +121,30 @@
     <input type="text" id="song" placeholder="예: 변하은 - 기지개">
 
     <label>📝 오늘 배운 내용</label>
-    <textarea id="overview" placeholder="해머링"></textarea>
+    <textarea id="overview" placeholder="sus4"></textarea>
 
-    <label>💡 스승님의 특급 가르침</label>
-    <textarea id="tips" placeholder="너무 열심히 연습을 해선 안된다!!"></textarea>
+    <label>💡스승님의 특급 꿀팁</label>
+    <textarea id="tips" placeholder="연습을 너무 열심히
+      해선 안된다!"></textarea>
 
-    <label>🎸 새로운 코드</label>
+    <label>🎸 새로 배운 코드</label>
     <div id="chordInputContainer"></div>
     <div class="add-row-btn" onclick="addChordRow()">+ 코드 칸 추가하기</div>
 
     <label>🔥 다음 주 과제</label>
-    <textarea id="homework" placeholder="재미있어!!!"></textarea>
+    <textarea id="homework" placeholder="재미있다!!!"></textarea>
+
+    <label>💭 나의 연습 일기 & 궁금증</label>
+    <textarea id="selfNote" placeholder="연습하며 깨달은 점, 안 되는 부분, 선생님께 물어볼 질문 등을 자유롭게 적어보세요."></textarea>
 
     <label>🔗 참고 자료 (구글 드라이브 링크)</label>
     <input type="text" id="driveLink" placeholder="예: https://drive.google.com/file/d/...">
 
     <button id="saveBtn" onclick="saveLesson()">기록 저장하기</button>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="🔍 곡명, 내용, 코드 등으로 검색..." onkeyup="renderList()">
+    </div>
 
     <div id="lessonList"></div>
   </div>
@@ -168,6 +179,7 @@
       const overview = document.getElementById('overview').value;
       const tips = document.getElementById('tips').value;
       const homework = document.getElementById('homework').value;
+      const selfNote = document.getElementById('selfNote').value; // 새 기능 저장!
       const driveLink = document.getElementById('driveLink').value;
 
       if(!date || !overview) {
@@ -190,13 +202,13 @@
       if (editTargetId) {
         const index = lessons.findIndex(lesson => lesson.id === editTargetId);
         if (index !== -1) {
-          lessons[index] = { id: editTargetId, date, song, overview, tips, chordsList, homework, driveLink };
+          lessons[index] = { id: editTargetId, date, song, overview, tips, chordsList, homework, selfNote, driveLink };
         }
         editTargetId = null; 
         document.getElementById('saveBtn').innerText = '기록 저장하기'; 
         document.getElementById('saveBtn').style.backgroundColor = '#222'; 
       } else {
-        const lesson = { id: Date.now(), date, song, overview, tips, chordsList, homework, driveLink };
+        const lesson = { id: Date.now(), date, song, overview, tips, chordsList, homework, selfNote, driveLink };
         lessons.unshift(lesson); 
       }
 
@@ -220,6 +232,7 @@
       document.getElementById('overview').value = lesson.overview || '';
       document.getElementById('tips').value = lesson.tips || '';
       document.getElementById('homework').value = lesson.homework || '';
+      document.getElementById('selfNote').value = lesson.selfNote || ''; // 새 기능 불러오기!
       document.getElementById('driveLink').value = lesson.driveLink || '';
 
       const container = document.getElementById('chordInputContainer');
@@ -252,7 +265,30 @@
       list.innerHTML = '';
       let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
 
-      lessons.forEach(lesson => {
+      // 👇 검색창에 입력한 글자 가져오기
+      const searchInput = document.getElementById('searchInput');
+      const keyword = searchInput ? searchInput.value.toLowerCase() : '';
+
+      // 👇 검색어에 맞는 기록만 골라내기 (필터링)
+      const filteredLessons = lessons.filter(lesson => {
+        if(!keyword) return true;
+        
+        let searchText = (lesson.date || '') + ' ' + (lesson.song || '') + ' ' + 
+                         (lesson.overview || '') + ' ' + (lesson.tips || '') + ' ' + 
+                         (lesson.homework || '') + ' ' + (lesson.selfNote || '');
+        if (lesson.chordsList) {
+          searchText += ' ' + lesson.chordsList.map(c => c.name).join(' ');
+        }
+        return searchText.toLowerCase().includes(keyword);
+      });
+
+      // 검색 결과가 없을 때 보여주는 메시지
+      if(filteredLessons.length === 0 && keyword !== '') {
+        list.innerHTML = `<p style="text-align:center; color:#888; margin-top:30px; font-weight:600;">"${keyword}"에 대한 기록이 없어요! 🎸</p>`;
+        return;
+      }
+
+      filteredLessons.forEach(lesson => {
         let content = `<div class="record-item">
             <h3>📅 ${lesson.date}</h3>`;
             
@@ -277,6 +313,10 @@
             }
             
             if(lesson.homework) content += `<p style="color:#ff4d4f;"><strong>🔥 과제:</strong><br>${formatText(lesson.homework)}</p>`;
+            
+            // 👇 연습 일기가 예쁜 파란색으로 화면에 뜹니다!
+            if(lesson.selfNote) content += `<p style="color:#1976D2;"><strong>💭 나의 연습 일기:</strong><br>${formatText(lesson.selfNote)}</p>`;
+            
             if(lesson.driveLink) content += `<a href="${lesson.driveLink}" target="_blank" class="link-btn">📁 자료 보기</a>`;
             
             content += `
