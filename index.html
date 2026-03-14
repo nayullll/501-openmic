@@ -10,6 +10,7 @@
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
+    /* 화면 당길 때 부드럽게 움직이도록 배경 고정 */
     body { 
       font-family: 'Pretendard', sans-serif; 
       margin: 0; 
@@ -18,6 +19,7 @@
       display: flex; 
       justify-content: center; 
       color: #333;
+      overflow-x: hidden;
     }
 
     .app-box { 
@@ -28,6 +30,23 @@
       border-radius: 24px; 
       box-sizing: border-box; 
       box-shadow: 0 15px 35px rgba(0,0,0,0.05); 
+      /* 👇 당길 때 쫀득하게 움직이는 효과를 위한 설정 */
+      position: relative;
+      z-index: 2;
+    }
+
+    /* 👇 당길 때 뒤에 숨어있다가 나오는 새로고침 아이콘 */
+    .pull-indicator {
+      position: absolute;
+      top: 15px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 1.5em;
+      color: #888;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 0.2s;
     }
 
     .main-image {
@@ -38,41 +57,7 @@
       margin-bottom: 20px; 
     }
 
-    /* 👇 제목과 새로고침 버튼을 나란히 두기 위한 공간입니다 */
-    .title-wrap {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      margin-bottom: 5px;
-    }
-    
-    h2 { color: #111; text-align: center; font-size: 1.6em; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
-    
-    /* 👇 새로고침 버튼 디자인 (누르면 팽그르르 돕니다!) */
-    .refresh-btn {
-      position: absolute;
-      right: 0;
-      background: #ffffff;
-      border: 1px solid #e1e1e1;
-      border-radius: 50%;
-      width: 38px;
-      height: 38px;
-      font-size: 1.1em;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0;
-    }
-    .refresh-btn:active {
-      transform: rotate(180deg) scale(0.9);
-      background: #f4f5f7;
-    }
-    /* ------------------------------------------------ */
-
+    h2 { color: #111; text-align: center; font-size: 1.6em; font-weight: 800; margin-top: 0; letter-spacing: -0.5px; }
     label { font-weight: 600; color: #666; font-size: 0.85em; margin-top: 20px; display: block; letter-spacing: -0.3px; }
     
     input, textarea { 
@@ -150,13 +135,12 @@
 </head>
 <body>
 
-  <div class="app-box">
+  <div class="pull-indicator" id="pullIndicator">⬇️</div>
+
+  <div class="app-box" id="appBox">
     <img src="https://i.postimg.cc/rmfjc5Yn/IMG-6009.jpg" alt="메인 사진" class="main-image">
 
-    <div class="title-wrap">
-      <h2>🎤 501호 오픈 마이크</h2>
-      <button class="refresh-btn" onclick="window.location.reload()">🔄</button>
-    </div>
+    <h2>🎤 501호 오픈 마이크</h2>
     
     <label>📅 레슨 날짜</label>
     <input type="date" id="date">
@@ -390,6 +374,65 @@
         list.innerHTML += content;
       });
     }
+
+    // ==========================================
+    // 👇 화면 당겨서 새로고침 (Pull-to-Refresh) 엔진!
+    // ==========================================
+    let startY = 0;
+    let currentY = 0;
+    let isPulling = false;
+    const appBox = document.getElementById('appBox');
+    const indicator = document.getElementById('pullIndicator');
+
+    document.addEventListener('touchstart', function(e) {
+      // 스크롤이 맨 위에 있을 때만 작동을 시작합니다.
+      if (window.scrollY === 0) {
+        startY = e.touches[0].clientY;
+        isPulling = true;
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function(e) {
+      if (!isPulling) return;
+      currentY = e.touches[0].clientY;
+      let pullDistance = currentY - startY;
+      
+      // 위에서 아래로 당길 때만 (거리가 0보다 클 때)
+      if (pullDistance > 0 && window.scrollY === 0) {
+        indicator.style.opacity = '1'; // 숨어있던 아이콘 보여주기
+        // 고무줄처럼 쫀득하게 당겨지는 수학 공식! (최대 70px까지만 내려옴)
+        let moveY = Math.min(pullDistance * 0.4, 70); 
+        appBox.style.transform = `translateY(${moveY}px)`;
+        
+        // 많이 당기면 아이콘이 빙글! 돕니다
+        if(pullDistance > 120) {
+          indicator.innerText = '🔄';
+          indicator.style.transform = 'rotate(180deg)';
+        } else {
+          indicator.innerText = '⬇️';
+          indicator.style.transform = 'rotate(0deg)';
+        }
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchend', function(e) {
+      if (!isPulling) return;
+      isPulling = false;
+      let pullDistance = currentY - startY;
+      
+      // 충분히 길게 당겼다가 놓으면 진짜로 새로고침!
+      if (pullDistance > 120 && window.scrollY === 0) {
+        appBox.style.transform = `translateY(50px)`;
+        indicator.innerText = '🔄';
+        setTimeout(() => window.location.reload(), 200); // 0.2초 뒤에 팟!
+      } else {
+        // 찔끔 당겼다가 놓으면 튕~ 하고 원래 자리로 복귀!
+        appBox.style.transition = 'transform 0.3s cubic-bezier(0.25, 1.5, 0.5, 1)'; // 젤리처럼 튕기는 효과
+        appBox.style.transform = 'translateY(0)';
+        indicator.style.opacity = '0';
+        setTimeout(() => { appBox.style.transition = ''; }, 300);
+      }
+    });
   </script>
 
 </body>
