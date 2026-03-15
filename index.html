@@ -47,11 +47,21 @@
     }
     input:focus, textarea:focus { outline: none; border-color: var(--accent-blue); }
 
+    /* 날짜칸 높이 보정 */
+    input[type="date"] {
+      height: 52px;
+    }
+
+    /* 곡명 입력창 높이 조정 */
+    #song {
+      height: 80px;
+      resize: none;
+    }
+
     .chord-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
     .chord-input-row input { margin: 0; }
     .add-row-btn { background: var(--input-bg); color: var(--text-sub); text-align: center; padding: 12px; border-radius: 10px; font-size: 0.9em; font-weight: 700; cursor: pointer; margin-bottom: 15px; }
 
-    /* 코드 도감 스타일 */
     .chord-encyclopedia { margin: 20px 0; padding: 20px; background: var(--input-bg); border-radius: 16px; display: none; }
     .ency-title { font-weight: 800; font-size: 1em; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
     .ency-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -61,7 +71,6 @@
 
     .toggle-ency-btn { width: 100%; padding: 12px; background: var(--accent-blue); color: #fff; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
 
-    /* 리스트 코드 그리드 */
     .chord-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; background: var(--input-bg); padding: 12px; border-radius: 12px; width: 100%; box-sizing: border-box; }
     .chord-card { background: var(--chord-orange); border-radius: 10px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; }
     .chord-card p { margin: 0; font-weight: 800; font-size: 1em; color: #ffffff !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 90%; text-align: center; }
@@ -71,7 +80,7 @@
     .record-item { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; margin-top: 15px; border-radius: 16px; }
     .record-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
     .record-header h3 { margin: 0; color: var(--text-main); font-size: 1.05em; }
-    .song-badge { font-size: 0.8em; background: var(--input-bg); color: var(--text-sub); padding: 4px 10px; border-radius: 12px; }
+    .song-badge { font-size: 0.8em; background: var(--input-bg); color: var(--text-sub); padding: 4px 10px; border-radius: 12px; white-space: pre-wrap; word-break: break-all; text-align: left; }
     .record-details { margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); display: none; }
     .record-item p { font-size: 0.95em; color: var(--text-main); margin: 12px 0; line-height: 1.6;}
     .action-btns { margin-top: 20px; text-align: right; border-top: 1px solid var(--border-color); padding-top: 15px; }
@@ -79,14 +88,13 @@
     .edit-btn { color: var(--text-main); background: var(--input-bg); }
     .delete-btn { color: #ff4d4f; background: #fff0f0; }
 
-    /* 👇 데이터 관리 버튼 정렬 핵심 수정 */
     .data-management { margin-top: 40px; padding-top: 20px; border-top: 1px dashed var(--border-color); text-align: center; }
     .data-btns { 
       display: flex; 
       gap: 10px; 
       margin-top: 15px; 
       justify-content: center;
-      align-items: stretch; /* 자식 요소들의 높이를 동일하게 */
+      align-items: stretch;
     }
     .data-btns button, .import-label { 
       flex: 1; 
@@ -101,11 +109,10 @@
       display: flex; 
       align-items: center; 
       justify-content: center;
-      margin: 0; /* 불필요한 마진 제거 */
+      margin: 0; 
       padding: 0;
       box-sizing: border-box;
     }
-    /* label 특유의 마진이나 정렬 문제 해결 */
     .import-label { margin-bottom: 0 !important; cursor: pointer; }
   </style>
 </head>
@@ -123,22 +130,22 @@
     <input type="date" id="date">
 
     <label>🎵 곡명 (연습곡)</label>
-    <input type="text" id="song" placeholder="예: 변하은 - 기지개">
+    <textarea id="song" placeholder="예: 변하은 - 기지개&#10;다음 곡 - 제목"></textarea>
 
     <label>📝 오늘 배운 내용</label>
-    <textarea id="overview" placeholder="배운 기술이나 이론"></textarea>
+    <textarea id="overview" placeholder="해머링"></textarea>
 
     <label>💡스승님의 특급 꿀팁</label>
-    <textarea id="tips" placeholder="잊지 말아야 할 포인트!"></textarea>
+    <textarea id="tips" placeholder="연습을 지나치게 열심히 해서는 안된다!"></textarea>
 
     <label>🎸 새로 배운 코드</label>
     <div id="chordInputContainer"></div>
     <div class="add-row-btn" onclick="addChordRow()">+ 코드 칸 추가하기</div>
 
     <label>🔥 다음 주 과제</label>
-    <textarea id="homework" placeholder="이번 주 숙제는?"></textarea>
+    <textarea id="homework" placeholder="숙제는 즐겁다"></textarea>
 
-    <label>💭 나의 연습 일기 & 궁금증</label>
+    <label>💭 연습 일기 & 궁금증</label>
     <textarea id="selfNote" placeholder="연습하며 느낀 점, 질문 등"></textarea>
 
     <label>🔗 참고 자료 (드라이브 링크)</label>
@@ -196,7 +203,7 @@
       const btn = document.querySelector('.toggle-ency-btn');
       if(ency.style.display === 'block') {
         ency.style.display = 'none';
-        btn.innerText = '📚 나의 코드 도감 보기';
+        btn.innerText = '📚 코드 도감';
       } else {
         ency.style.display = 'block';
         btn.innerText = '닫기';
@@ -287,11 +294,11 @@
           <div class="record-item">
             <div class="record-header" onclick="toggleDetails(${lesson.id})">
               <h3>📅 ${lesson.date}</h3>
-              ${lesson.song ? `<span class="song-badge">🎵 ${lesson.song}</span>` : ''}
+              ${lesson.song ? `<span class="song-badge">🎵 ${lesson.song.replace(/\n/g, '<br>')}</span>` : ''}
             </div>
             <div class="record-details" id="details-${lesson.id}">
               <p><strong>📝 배운 내용:</strong><br>${lesson.overview.replace(/\n/g, '<br>')}</p>
-              ${lesson.tips ? `<p><strong>💡 꿀팁:</strong><br>${lesson.tips.replace(/\n/g, '<br>')}</p>` : ''}
+              ${lesson.tips ? `<p><strong>💡 스승님 꿀팁:</strong><br>${lesson.tips.replace(/\n/g, '<br>')}</p>` : ''}
               ${lesson.chordsList && lesson.chordsList.length > 0 ? `
                 <div class="chord-grid">${lesson.chordsList.map(c => `
                   <div class="chord-card">
