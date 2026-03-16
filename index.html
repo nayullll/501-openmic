@@ -47,16 +47,8 @@
     }
     input:focus, textarea:focus { outline: none; border-color: var(--accent-blue); }
 
-    /* 날짜칸 높이 보정 */
-    input[type="date"] {
-      height: 52px;
-    }
-
-    /* 곡명 입력창 높이 조정 */
-    #song {
-      height: 80px;
-      resize: none;
-    }
+    input[type="date"] { height: 52px; }
+    #song { height: 80px; resize: none; }
 
     .chord-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
     .chord-input-row input { margin: 0; }
@@ -89,30 +81,8 @@
     .delete-btn { color: #ff4d4f; background: #fff0f0; }
 
     .data-management { margin-top: 40px; padding-top: 20px; border-top: 1px dashed var(--border-color); text-align: center; }
-    .data-btns { 
-      display: flex; 
-      gap: 10px; 
-      margin-top: 15px; 
-      justify-content: center;
-      align-items: stretch;
-    }
-    .data-btns button, .import-label { 
-      flex: 1; 
-      height: 48px; 
-      background: var(--input-bg); 
-      border: 1px solid var(--border-color); 
-      border-radius: 12px; 
-      font-size: 0.9em; 
-      font-weight: 700; 
-      cursor: pointer; 
-      color: var(--text-main); 
-      display: flex; 
-      align-items: center; 
-      justify-content: center;
-      margin: 0; 
-      padding: 0;
-      box-sizing: border-box;
-    }
+    .data-btns { display: flex; gap: 10px; margin-top: 15px; justify-content: center; align-items: stretch; }
+    .data-btns button, .import-label { flex: 1; height: 48px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; font-size: 0.9em; font-weight: 700; cursor: pointer; color: var(--text-main); display: flex; align-items: center; justify-content: center; margin: 0; padding: 0; box-sizing: border-box; }
     .import-label { margin-bottom: 0 !important; cursor: pointer; }
   </style>
 </head>
@@ -133,19 +103,19 @@
     <textarea id="song" placeholder="예: 변하은 - 기지개&#10;다음 곡 - 제목"></textarea>
 
     <label>📝 오늘 배운 내용</label>
-    <textarea id="overview" placeholder="해머링"></textarea>
+    <textarea id="overview" placeholder="배운 기술이나 이론"></textarea>
 
     <label>💡스승님의 특급 꿀팁</label>
-    <textarea id="tips" placeholder="연습을 지나치게 열심히 해서는 안된다!"></textarea>
+    <textarea id="tips" placeholder="잊지 말아야 할 포인트!"></textarea>
 
     <label>🎸 새로 배운 코드</label>
     <div id="chordInputContainer"></div>
     <div class="add-row-btn" onclick="addChordRow()">+ 코드 칸 추가하기</div>
 
     <label>🔥 다음 주 과제</label>
-    <textarea id="homework" placeholder="숙제는 즐겁다"></textarea>
+    <textarea id="homework" placeholder="이번 주 숙제는?"></textarea>
 
-    <label>💭 연습 일기 & 궁금증</label>
+    <label>💭 나의 연습 일기 & 궁금증</label>
     <textarea id="selfNote" placeholder="연습하며 느낀 점, 질문 등"></textarea>
 
     <label>🔗 참고 자료 (드라이브 링크)</label>
@@ -203,7 +173,7 @@
       const btn = document.querySelector('.toggle-ency-btn');
       if(ency.style.display === 'block') {
         ency.style.display = 'none';
-        btn.innerText = '📚 코드 도감';
+        btn.innerText = '📚 나의 코드 도감 보기';
       } else {
         ency.style.display = 'block';
         btn.innerText = '닫기';
@@ -211,6 +181,7 @@
       }
     }
 
+    // 👇 이 부분에서 .toUpperCase()를 제거하여 대소문자를 유지합니다.
     function updateEncyclopedia() {
       const lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
       const encyGrid = document.getElementById('encyGrid');
@@ -219,12 +190,12 @@
       lessons.forEach(l => {
         if(l.chordsList) {
           l.chordsList.forEach(c => {
-            const name = c.name.trim().toUpperCase();
+            const name = c.name.trim(); // .toUpperCase() 삭제
             if(name && !chordMap.has(name)) { chordMap.set(name, c.link || ''); }
           });
         }
       });
-      const sortedKeys = Array.from(chordMap.keys()).sort();
+      const sortedKeys = Array.from(chordMap.keys()).sort((a, b) => a.localeCompare(b)); // 대소문자 섞인 정렬 대응
       encyCount.innerText = `${sortedKeys.length}개`;
       encyGrid.innerHTML = sortedKeys.map(name => {
         const link = chordMap.get(name);
@@ -298,7 +269,7 @@
             </div>
             <div class="record-details" id="details-${lesson.id}">
               <p><strong>📝 배운 내용:</strong><br>${lesson.overview.replace(/\n/g, '<br>')}</p>
-              ${lesson.tips ? `<p><strong>💡 스승님 꿀팁:</strong><br>${lesson.tips.replace(/\n/g, '<br>')}</p>` : ''}
+              ${lesson.tips ? `<p><strong>💡 꿀팁:</strong><br>${lesson.tips.replace(/\n/g, '<br>')}</p>` : ''}
               ${lesson.chordsList && lesson.chordsList.length > 0 ? `
                 <div class="chord-grid">${lesson.chordsList.map(c => `
                   <div class="chord-card">
