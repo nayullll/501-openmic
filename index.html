@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
@@ -7,7 +8,10 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="501호 레슨">
   <meta name="mobile-web-app-capable" content="yes">
-  
+  <meta name="theme-color" content="#222222">
+
+  <!-- PWA manifest (inline via JS) -->
+
   <title>501호 오픈 마이크</title>
   <link rel="apple-touch-icon" href="https://i.postimg.cc/C1bnY8Ln/IMG-6011.jpg?v=8">
 
@@ -18,42 +22,91 @@
       --bg-color: #f4f5f7; --card-bg: #ffffff; --text-main: #111111;
       --text-sub: #666666; --border-color: #e1e1e1; --input-bg: #fafafa;
       --primary-color: #222222; --accent-blue: #1976D2; --chord-orange: #EDA18C;
+      --danger: #ff4d4f; --success: #2e7d32;
     }
-
     [data-theme='dark'] {
       --bg-color: #1a1a1a; --card-bg: #2d2d2d; --text-main: #eeeeee;
       --text-sub: #aaaaaa; --border-color: #444444; --input-bg: #3d3d3d;
       --primary-color: #ffffff;
     }
 
-    body { 
-      font-family: 'Pretendard', sans-serif; margin: 0; padding: 20px; 
+    body {
+      font-family: 'Pretendard', sans-serif; margin: 0; padding: 20px;
       background-color: var(--bg-color); display: flex; flex-direction: column; align-items: center;
       color: var(--text-main); transition: background-color 0.3s ease;
     }
 
-    .app-box { width: 100%; max-width: 450px; background: var(--card-bg); padding: 30px; border-radius: 24px; box-sizing: border-box; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+    /* ── 토스트 알림 ── */
+    #toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #222; color: #fff; padding: 13px 22px; border-radius: 14px;
+      font-size: 0.9em; font-weight: 600; z-index: 9999;
+      transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), opacity 0.35s;
+      opacity: 0; pointer-events: none; white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.22);
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    #toast.success { background: var(--success); }
+    #toast.warning { background: #e65100; }
+    #toast.error   { background: var(--danger); }
+
+    /* ── 백업 경고 배너 ── */
+    #backupBanner {
+      display: none; width: 100%; max-width: 450px; box-sizing: border-box;
+      background: #fff3e0; border: 1px solid #ffb74d; border-radius: 14px;
+      padding: 14px 18px; margin-bottom: 14px;
+      font-size: 0.88em; font-weight: 600; color: #e65100;
+      display: flex; align-items: center; gap: 10px;
+    }
+    #backupBanner button {
+      margin-left: auto; background: #e65100; color: #fff;
+      border: none; border-radius: 8px; padding: 6px 12px;
+      font-size: 0.85em; font-weight: 700; cursor: pointer; white-space: nowrap;
+    }
+
+    .app-box {
+      width: 100%; max-width: 450px; background: var(--card-bg);
+      padding: 30px; border-radius: 24px; box-sizing: border-box;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    }
     .main-image { width: 100%; height: 200px; object-fit: cover; border-radius: 16px; margin-bottom: 20px; }
     .title-wrap { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-    .theme-toggle { background: var(--input-bg); border: 1px solid var(--border-color); width: 42px; height: 42px; border-radius: 12px; cursor: pointer; font-size: 1.2em; display: flex; align-items: center; justify-content: center; padding: 0; }
-    
+    .theme-toggle {
+      background: var(--input-bg); border: 1px solid var(--border-color);
+      width: 42px; height: 42px; border-radius: 12px; cursor: pointer;
+      font-size: 1.2em; display: flex; align-items: center; justify-content: center; padding: 0;
+    }
+
     h2 { color: var(--text-main); font-size: 1.5em; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
     label { font-weight: 600; color: var(--text-sub); font-size: 0.85em; margin-top: 20px; display: block; }
-    
-    input, textarea { 
-      display: block; width: 100%; box-sizing: border-box; padding: 14px 16px; margin: 8px 0 15px 0; 
-      border: 1px solid var(--border-color); border-radius: 12px; font-size: 16px; font-family: inherit; 
+
+    input, textarea {
+      display: block; width: 100%; box-sizing: border-box; padding: 14px 16px; margin: 8px 0 15px 0;
+      border: 1px solid var(--border-color); border-radius: 12px; font-size: 16px; font-family: inherit;
       background: var(--input-bg); color: var(--text-main); transition: 0.2s; -webkit-appearance: none;
     }
     input:focus, textarea:focus { outline: none; border-color: var(--accent-blue); }
-
     input[type="date"] { height: 52px; }
-    #song { height: 80px; resize: none; }
+    #song, #overview, #tips, #homework, #selfNote { resize: none; }
 
-    .dynamic-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
-    .dynamic-input-row input { margin: 0; }
-    .add-row-btn { background: var(--input-bg); color: var(--text-sub); text-align: center; padding: 12px; border-radius: 10px; font-size: 0.9em; font-weight: 700; cursor: pointer; margin-bottom: 15px; }
+    /* ── 동적 행 (코드 / 링크) ── */
+    .dynamic-input-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+    .dynamic-input-row input { margin: 0; flex: 1; }
+    .remove-row-btn {
+      flex-shrink: 0; width: 36px; height: 36px; background: #fff0f0;
+      border: 1px solid #ffd0d0; border-radius: 10px; color: var(--danger);
+      font-size: 1.1em; font-weight: 700; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; padding: 0; line-height: 1;
+    }
+    .add-row-btn {
+      background: var(--input-bg); color: var(--text-sub); text-align: center;
+      padding: 12px; border-radius: 10px; font-size: 0.9em; font-weight: 700;
+      cursor: pointer; margin-bottom: 15px; border: 1px dashed var(--border-color);
+      transition: background 0.2s;
+    }
+    .add-row-btn:hover { background: var(--border-color); }
 
+    /* ── 코드 도감 ── */
     .chord-encyclopedia { margin: 20px 0; padding: 20px; background: var(--input-bg); border-radius: 16px; display: none; }
     .ency-title { font-weight: 800; font-size: 1em; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
     .ency-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -67,30 +120,58 @@
     .chord-card { background: var(--chord-orange); border-radius: 10px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; }
     .chord-card p { margin: 0; font-weight: 800; font-size: 1em; color: #ffffff !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 90%; text-align: center; }
     .chord-link-btn { margin-top: 6px; padding: 4px 8px; background: #ffffff; color: var(--chord-orange); text-decoration: none; border-radius: 6px; font-size: 0.7em; font-weight: 800; }
-    
-    #saveBtn { width: 100%; padding: 16px; margin-top: 15px; background-color: var(--primary-color); color: var(--card-bg); border: none; border-radius: 14px; font-size: 1.05em; font-weight: 700; cursor: pointer; }
+
+    #saveBtn {
+      width: 100%; padding: 16px; margin-top: 15px;
+      background-color: var(--primary-color); color: var(--card-bg);
+      border: none; border-radius: 14px; font-size: 1.05em; font-weight: 700; cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    #saveBtn:active { opacity: 0.8; transform: scale(0.98); }
+
+    /* ── 레슨 카드 ── */
     .record-item { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; margin-top: 15px; border-radius: 16px; }
     .record-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
     .record-header h3 { margin: 0; color: var(--text-main); font-size: 1.05em; }
     .song-badge { font-size: 0.8em; background: var(--input-bg); color: var(--text-sub); padding: 4px 10px; border-radius: 12px; white-space: pre-wrap; word-break: break-all; text-align: left; }
     .record-details { margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); display: none; }
-    .record-item p { font-size: 0.95em; color: var(--text-main); margin: 12px 0; line-height: 1.6;}
+    .record-item p { font-size: 0.95em; color: var(--text-main); margin: 12px 0; line-height: 1.6; }
     .action-btns { margin-top: 20px; text-align: right; border-top: 1px solid var(--border-color); padding-top: 15px; }
-    .edit-btn, .delete-btn { border: none; font-size: 0.85em; padding: 8px 12px; border-radius: 8px; font-weight: 600; margin-left: 5px; }
+    .edit-btn, .delete-btn { border: none; font-size: 0.85em; padding: 8px 12px; border-radius: 8px; font-weight: 600; margin-left: 5px; cursor: pointer; }
     .edit-btn { color: var(--text-main); background: var(--input-bg); }
-    .delete-btn { color: #ff4d4f; background: #fff0f0; }
+    .delete-btn { color: var(--danger); background: #fff0f0; }
 
+    /* ── 데이터 관리 ── */
     .data-management { margin-top: 40px; padding-top: 20px; border-top: 1px dashed var(--border-color); text-align: center; }
     .data-btns { display: flex; gap: 10px; margin-top: 15px; justify-content: center; align-items: stretch; }
-    .data-btns button, .import-label { flex: 1; height: 48px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; font-size: 0.9em; font-weight: 700; cursor: pointer; color: var(--text-main); display: flex; align-items: center; justify-content: center; margin: 0; padding: 0; box-sizing: border-box; }
-    .import-label { margin-bottom: 0 !important; cursor: pointer; }
+    .data-btns button, .import-label {
+      flex: 1; height: 48px; background: var(--input-bg); border: 1px solid var(--border-color);
+      border-radius: 12px; font-size: 0.9em; font-weight: 700; cursor: pointer; color: var(--text-main);
+      display: flex; align-items: center; justify-content: center; margin: 0; padding: 0; box-sizing: border-box;
+    }
 
-    /* 링크 목록 스타일 */
+    /* ── 참고 자료 링크 ── */
     .link-list-wrap { margin-top: 10px; }
-    .link-item { display: inline-block; background: var(--input-bg); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 8px; margin-right: 6px; margin-bottom: 6px; font-size: 0.85em; text-decoration: none; color: var(--accent-blue); font-weight: 600; }
+    .link-item {
+      display: inline-block; background: var(--input-bg); border: 1px solid var(--border-color);
+      padding: 6px 12px; border-radius: 8px; margin-right: 6px; margin-bottom: 6px;
+      font-size: 0.85em; text-decoration: none; color: var(--accent-blue); font-weight: 600;
+    }
   </style>
+
 </head>
 <body data-theme="light">
+
+  <!-- 💾 백업 경고 배너 -->
+
+  <div id="backupBanner">
+    <span>⚠️ 마지막 백업으로부터 7일이 지났어요!</span>
+    <button onclick="exportData()">지금 백업</button>
+  </div>
+
+  <!-- 🔔 토스트 -->
+
+  <div id="toast"></div>
 
   <div class="app-box">
     <div class="title-wrap">
@@ -98,86 +179,136 @@
       <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
     </div>
 
-    <img src="https://i.postimg.cc/rmfjc5Yn/IMG-6009.jpg" alt="메인 사진" class="main-image">
+```
+<img src="https://i.postimg.cc/rmfjc5Yn/IMG-6009.jpg" alt="메인 사진" class="main-image">
 
-    <label>📅 레슨 날짜</label>
-    <input type="date" id="date">
+<label>📅 레슨 날짜</label>
+<input type="date" id="date">
 
-    <label>🎵 곡명 (연습곡)</label>
-    <textarea id="song" placeholder="예: 변하은 - 기지개&#10;다음 곡 - 제목"></textarea>
+<label>🎵 곡명 (연습곡)</label>
+<textarea id="song" rows="3" placeholder="예: 변하은 - 기지개&#10;다음 곡 - 제목"></textarea>
 
-    <label>📝 오늘 배운 내용</label>
-    <textarea id="overview" placeholder="배운 기술이나 이론"></textarea>
+<label>📝 오늘 배운 내용</label>
+<textarea id="overview" rows="4" placeholder="배운 기술이나 이론"></textarea>
 
-    <label>💡스승님의 특급 꿀팁</label>
-    <textarea id="tips" placeholder="잊지 말아야 할 포인트!"></textarea>
+<label>💡 스승님의 특급 꿀팁</label>
+<textarea id="tips" rows="3" placeholder="잊지 말아야 할 포인트!"></textarea>
 
-    <label>🎸 새로 배운 코드</label>
-    <div id="chordInputContainer"></div>
-    <div class="add-row-btn" onclick="addDynamicRow('chordInputContainer', 'chord-name', 'chord-link', '코드', '이미지 링크')">+ 코드 칸 추가하기</div>
+<label>🎸 새로 배운 코드</label>
+<div id="chordInputContainer"></div>
+<div class="add-row-btn" onclick="addDynamicRow('chordInputContainer', 'chord-name', 'chord-link', '코드명', '이미지 링크')">+ 코드 칸 추가하기</div>
 
-    <label>🔥 다음 주 과제</label>
-    <textarea id="homework" placeholder="이번 주 숙제는?"></textarea>
+<label>🔥 다음 주 과제</label>
+<textarea id="homework" rows="3" placeholder="이번 주 숙제는?"></textarea>
 
-    <label>💭 나의 연습 일기 & 궁금증</label>
-    <textarea id="selfNote" placeholder="연습하며 느낀 점, 질문 등"></textarea>
+<label>💭 나의 연습 일기 &amp; 궁금증</label>
+<textarea id="selfNote" rows="3" placeholder="연습하며 느낀 점, 질문 등"></textarea>
 
-    <label>🔗 참고 자료 (여러 개 등록 가능)</label>
-    <div id="linkInputContainer"></div>
-    <div class="add-row-btn" onclick="addDynamicRow('linkInputContainer', 'link-name', 'link-url', '자료 이름', '주소(https://...)')">+ 자료 링크 추가하기</div>
+<label>🔗 참고 자료 (여러 개 등록 가능)</label>
+<div id="linkInputContainer"></div>
+<div class="add-row-btn" onclick="addDynamicRow('linkInputContainer', 'link-name', 'link-url', '자료 이름', '주소(https://...)')">+ 자료 링크 추가하기</div>
 
-    <button id="saveBtn" onclick="saveLesson()">누가 그랬던가 잊혀져 간다는 게 일부러 그런 건 아닙디다</button>
+<button id="saveBtn" onclick="saveLesson()">누가 그랬던가 잊혀져 간다는 게 일부러 그런 건 아닙디다</button>
 
-    <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--border-color);">
+<hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--border-color);">
 
-    <button class="toggle-ency-btn" onclick="toggleEncyclopedia()">📚 나의 코드 도감 보기</button>
-    <div class="chord-encyclopedia" id="chordEncy">
-      <div class="ency-title">모든 수집 코드 <span id="encyCount" style="color:var(--accent-blue); font-size:0.8em;">0개</span></div>
-      <div class="ency-grid" id="encyGrid"></div>
-    </div>
+<button class="toggle-ency-btn" onclick="toggleEncyclopedia()">📚 나의 코드 도감 보기</button>
+<div class="chord-encyclopedia" id="chordEncy">
+  <div class="ency-title">모든 수집 코드 <span id="encyCount" style="color:var(--accent-blue); font-size:0.8em;">0개</span></div>
+  <div class="ency-grid" id="encyGrid"></div>
+</div>
 
-    <input type="text" id="searchInput" placeholder="🔍 곡명, 내용 검색..." onkeyup="renderList()" style="margin-top: 10px;">
-    <div id="lessonList"></div>
+<input type="text" id="searchInput" placeholder="🔍 곡명, 내용 검색..." oninput="renderList()" style="margin-top: 10px;">
+<div id="lessonList"></div>
 
-    <div class="data-management">
-      <p style="font-size: 0.85em; color: var(--text-sub); font-weight: 600;">💾 데이터 관리</p>
-      <div class="data-btns">
-        <button onclick="exportData()">백업</button>
-        <label for="importData" class="import-label">복구</label>
-        <input type="file" id="importData" accept=".json" style="display:none;" onchange="importData(event)">
-      </div>
-    </div>
+<div class="data-management">
+  <p style="font-size: 0.85em; color: var(--text-sub); font-weight: 600;">💾 데이터 관리</p>
+  <div class="data-btns">
+    <button onclick="exportData()">백업</button>
+    <label for="importData" class="import-label">복구</label>
+    <input type="file" id="importData" accept=".json" style="display:none;" onchange="importData(event)">
+  </div>
+</div>
+```
+
   </div>
 
   <script>
-    let editTargetId = null; 
+    // ═══════════════════════════════════════════
+    // 🔒 XSS 방어 — 텍스트 이스케이프 유틸
+    // ═══════════════════════════════════════════
+    function esc(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+    }
+    // 줄바꿈 처리 (이스케이프 후 <br> 변환)
+    function escNl(str) { return esc(str).replace(/\n/g, '<br>'); }
+    // URL 검증 — http(s):// 로 시작하는 것만 허용
+    function safeUrl(url) {
+      if (!url) return '#';
+      const trimmed = url.trim();
+      return /^https?:\/\//i.test(trimmed) ? trimmed : '#';
+    }
 
-    window.onload = () => {
-      initTheme();
-      renderList();
-      updateEncyclopedia();
-      if(document.getElementById('chordInputContainer').innerHTML === "") addDynamicRow('chordInputContainer', 'chord-name', 'chord-link', '코드', '이미지 링크');
-      if(document.getElementById('linkInputContainer').innerHTML === "") addDynamicRow('linkInputContainer', 'link-name', 'link-url', '자료 이름', '주소(https://...)');
-    };
+    // ═══════════════════════════════════════════
+    // 🔔 토스트
+    // ═══════════════════════════════════════════
+    let _toastTimer = null;
+    function showToast(msg, type = 'success', duration = 2500) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `show ${type}`;
+      clearTimeout(_toastTimer);
+      _toastTimer = setTimeout(() => { t.className = ''; }, duration);
+    }
 
+    // ═══════════════════════════════════════════
+    // 📅 날짜 기본값 — 오늘
+    // ═══════════════════════════════════════════
+    function setTodayDate() {
+      const d = document.getElementById('date');
+      if (!d.value) d.value = new Date().toISOString().split('T')[0];
+    }
+
+    // ═══════════════════════════════════════════
+    // 💾 백업 유도 알림
+    // ═══════════════════════════════════════════
+    function checkBackupReminder() {
+      const last = localStorage.getItem('lastBackupDate');
+      const banner = document.getElementById('backupBanner');
+      if (!last) { banner.style.display = 'none'; return; }
+      const days = (Date.now() - Number(last)) / (1000 * 60 * 60 * 24);
+      banner.style.display = days >= 7 ? 'flex' : 'none';
+    }
+
+    // ═══════════════════════════════════════════
+    // 🌙 테마
+    // ═══════════════════════════════════════════
     function initTheme() {
-      const savedTheme = localStorage.getItem('theme') || 'light';
-      document.body.setAttribute('data-theme', savedTheme);
-      document.getElementById('themeBtn').innerText = savedTheme === 'light' ? '🌙' : '☀️';
+      const saved = localStorage.getItem('theme') || 'light';
+      document.body.setAttribute('data-theme', saved);
+      document.getElementById('themeBtn').innerText = saved === 'light' ? '🌙' : '☀️';
     }
-
     function toggleTheme() {
-      const currentTheme = document.body.getAttribute('data-theme');
-      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-      document.body.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      document.getElementById('themeBtn').innerText = newTheme === 'light' ? '🌙' : '☀️';
+      const cur = document.body.getAttribute('data-theme');
+      const next = cur === 'light' ? 'dark' : 'light';
+      document.body.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      document.getElementById('themeBtn').innerText = next === 'light' ? '🌙' : '☀️';
     }
 
+    // ═══════════════════════════════════════════
+    // 📚 코드 도감
+    // ═══════════════════════════════════════════
     function toggleEncyclopedia() {
       const ency = document.getElementById('chordEncy');
       const btn = document.querySelector('.toggle-ency-btn');
-      if(ency.style.display === 'block') {
+      if (ency.style.display === 'block') {
         ency.style.display = 'none';
         btn.innerText = '📚 나의 코드 도감 보기';
       } else {
@@ -186,161 +317,216 @@
         updateEncyclopedia();
       }
     }
-
     function updateEncyclopedia() {
       const lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
-      const encyGrid = document.getElementById('encyGrid');
-      const encyCount = document.getElementById('encyCount');
-      let chordMap = new Map();
+      const grid = document.getElementById('encyGrid');
+      const count = document.getElementById('encyCount');
+      const map = new Map();
       lessons.forEach(l => {
-        if(l.chordsList) {
-          l.chordsList.forEach(c => {
-            const name = c.name.trim();
-            if(name && !chordMap.has(name)) { chordMap.set(name, c.link || ''); }
-          });
-        }
+        (l.chordsList || []).forEach(c => {
+          const name = (c.name || '').trim();
+          if (name && !map.has(name)) map.set(name, c.link || '');
+        });
       });
-      const sortedKeys = Array.from(chordMap.keys()).sort((a, b) => a.localeCompare(b));
-      encyCount.innerText = `${sortedKeys.length}개`;
-      encyGrid.innerHTML = sortedKeys.map(name => {
-        const link = chordMap.get(name);
-        return `<div class="ency-item"><p>${name}</p>${link ? `<a href="${link}" target="_blank" class="ency-link-btn">🖼️ 보기</a>` : ''}</div>`;
+      const sorted = Array.from(map.keys()).sort((a, b) => a.localeCompare(b));
+      count.innerText = `${sorted.length}개`;
+      grid.innerHTML = sorted.map(name => {
+        const link = map.get(name);
+        const safe = safeUrl(link);
+        return `<div class="ency-item">
+          <p>${esc(name)}</p>
+          ${safe !== '#' ? `<a href="${esc(safe)}" target="_blank" rel="noopener noreferrer" class="ency-link-btn">🖼️ 보기</a>` : ''}
+        </div>`;
       }).join('');
     }
 
-    // 공통 행 추가 함수
+    // ═══════════════════════════════════════════
+    // ➕ 동적 행 추가 / ✖ 삭제
+    // ═══════════════════════════════════════════
     function addDynamicRow(containerId, nameClass, linkClass, namePh, linkPh, nameVal = '', linkVal = '') {
       const container = document.getElementById(containerId);
       const row = document.createElement('div');
       row.className = 'dynamic-input-row';
-      row.innerHTML = `<input type="text" class="${nameClass}" placeholder="${namePh}" value="${nameVal}">
-                       <input type="text" class="${linkClass}" placeholder="${linkPh}" value="${linkVal}">`;
+
+      const nameInput = document.createElement('input');
+      nameInput.type = 'text';
+      nameInput.className = nameClass;
+      nameInput.placeholder = namePh;
+      nameInput.value = nameVal;
+
+      const linkInput = document.createElement('input');
+      linkInput.type = 'text';
+      linkInput.className = linkClass;
+      linkInput.placeholder = linkPh;
+      linkInput.value = linkVal;
+
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'remove-row-btn';
+      removeBtn.innerHTML = '✕';
+      removeBtn.title = '삭제';
+      removeBtn.addEventListener('click', () => {
+        // 마지막 행이면 삭제하지 않고 값만 초기화
+        const rows = container.querySelectorAll('.dynamic-input-row');
+        if (rows.length <= 1) {
+          nameInput.value = '';
+          linkInput.value = '';
+        } else {
+          row.remove();
+        }
+      });
+
+      row.appendChild(nameInput);
+      row.appendChild(linkInput);
+      row.appendChild(removeBtn);
       container.appendChild(row);
     }
 
+    // ═══════════════════════════════════════════
+    // 💾 저장
+    // ═══════════════════════════════════════════
+    let editTargetId = null;
+
     function saveLesson() {
-      const date = document.getElementById('date').value;
-      const song = document.getElementById('song').value;
+      const date     = document.getElementById('date').value;
+      const song     = document.getElementById('song').value;
       const overview = document.getElementById('overview').value;
-      const tips = document.getElementById('tips').value;
+      const tips     = document.getElementById('tips').value;
       const homework = document.getElementById('homework').value;
       const selfNote = document.getElementById('selfNote').value;
 
-      if(!date || !overview) { alert('날짜와 내용은 필수!'); return; }
+      if (!date || !overview) {
+        showToast('📅 날짜와 배운 내용은 필수예요!', 'error');
+        return;
+      }
 
-      // 코드 리스트 추출
-      const chordRows = document.querySelectorAll('#chordInputContainer .dynamic-input-row');
-      let chordsList = [];
-      chordRows.forEach(row => {
-        const name = row.querySelector('.chord-name').value;
-        const link = row.querySelector('.chord-link').value;
+      // 코드 리스트
+      const chordsList = [];
+      document.querySelectorAll('#chordInputContainer .dynamic-input-row').forEach(row => {
+        const name = row.querySelector('.chord-name').value.trim();
+        const link = row.querySelector('.chord-link').value.trim();
         if (name || link) chordsList.push({ name, link });
       });
 
-      // 참고 자료 리스트 추출
-      const linkRows = document.querySelectorAll('#linkInputContainer .dynamic-input-row');
-      let linksList = [];
-      linkRows.forEach(row => {
-        const name = row.querySelector('.link-name').value;
-        const url = row.querySelector('.link-url').value;
+      // 링크 리스트
+      const linksList = [];
+      document.querySelectorAll('#linkInputContainer .dynamic-input-row').forEach(row => {
+        const name = row.querySelector('.link-name').value.trim();
+        const url  = row.querySelector('.link-url').value.trim();
         if (name || url) linksList.push({ name, url });
       });
 
       let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
-      const lessonData = { id: editTargetId || Date.now(), date, song, overview, tips, chordsList, linksList, homework, selfNote };
+      const data = { id: editTargetId || Date.now(), date, song, overview, tips, chordsList, linksList, homework, selfNote };
 
       if (editTargetId) {
-        const index = lessons.findIndex(l => l.id === editTargetId);
-        if (index !== -1) lessons[index] = lessonData;
+        const idx = lessons.findIndex(l => l.id === editTargetId);
+        if (idx !== -1) lessons[idx] = data;
         editTargetId = null;
         document.getElementById('saveBtn').innerText = '누가 그랬던가 잊혀져 간다는 게 일부러 그런 건 아닙디다';
+        showToast('✏️ 수정 완료!', 'success');
       } else {
-        lessons.unshift(lessonData);
+        lessons.unshift(data);
+        showToast('✅ 저장 완료!', 'success');
       }
 
       localStorage.setItem('guitarLessons', JSON.stringify(lessons));
       renderList();
       updateEncyclopedia();
-      
-      // 초기화
-      document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
-      document.getElementById('date').value = '';
-      document.getElementById('chordInputContainer').innerHTML = '';
-      document.getElementById('linkInputContainer').innerHTML = '';
-      addDynamicRow('chordInputContainer', 'chord-name', 'chord-link', '코드', '이미지 링크');
-      addDynamicRow('linkInputContainer', 'link-name', 'link-url', '자료 이름', '주소(https://...)');
+      resetForm();
     }
 
-    function renderList() {
-      const list = document.getElementById('lessonList');
-      list.innerHTML = '';
-      let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
-      const keyword = document.getElementById('searchInput').value.toLowerCase();
-
-      lessons.filter(l => {
-        let txt = (l.date + (l.song||'') + (l.overview||'') + (l.chordsList?l.chordsList.map(c=>c.name).join(''):'')).toLowerCase();
-        return txt.includes(keyword);
-      }).forEach(lesson => {
-        let content = `
-          <div class="record-item">
-            <div class="record-header" onclick="toggleDetails(${lesson.id})">
-              <h3>📅 ${lesson.date}</h3>
-              ${lesson.song ? `<span class="song-badge">🎵 ${lesson.song.replace(/\n/g, '<br>')}</span>` : ''}
-            </div>
-            <div class="record-details" id="details-${lesson.id}">
-              <p><strong>📝 배운 내용:</strong><br>${lesson.overview.replace(/\n/g, '<br>')}</p>
-              ${lesson.tips ? `<p><strong>💡 꿀팁:</strong><br>${lesson.tips.replace(/\n/g, '<br>')}</p>` : ''}
-              
-              ${lesson.chordsList && lesson.chordsList.length > 0 ? `
-                <div class="chord-grid">${lesson.chordsList.map(c => `
-                  <div class="chord-card">
-                    <p>${c.name}</p>
-                    ${c.link ? `<a href="${c.link}" target="_blank" class="chord-link-btn">🖼️ 보기</a>` : ''}
-                  </div>`).join('')}</div>` : ''}
-              
-              ${lesson.homework ? `<p style="color:#ff4d4f;"><strong>🔥 과제:</strong><br>${lesson.homework.replace(/\n/g, '<br>')}</p>` : ''}
-              ${lesson.selfNote ? `<p style="color:var(--accent-blue);"><strong>💭 나의 연습 일기:</strong><br>${lesson.selfNote.replace(/\n/g, '<br>')}</p>` : ''}
-              
-              ${lesson.linksList && lesson.linksList.length > 0 ? `
-                <div class="link-list-wrap">
-                  <strong>📁 참고 자료:</strong><br>
-                  ${lesson.linksList.map(l => `<a href="${l.url}" target="_blank" class="link-item">🔗 ${l.name || '링크'}</a>`).join('')}
-                </div>` : ''}
-
-              <div class="action-btns">
-                <button class="edit-btn" onclick="editLesson(${lesson.id})">수정</button>
-                <button class="delete-btn" onclick="deleteLesson(${lesson.id})">삭제</button>
-              </div>
-            </div>
-          </div>`;
-        list.innerHTML += content;
+    function resetForm() {
+      ['date','song','overview','tips','homework','selfNote'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
       });
+      document.getElementById('chordInputContainer').innerHTML = '';
+      document.getElementById('linkInputContainer').innerHTML = '';
+      addDynamicRow('chordInputContainer', 'chord-name', 'chord-link', '코드명', '이미지 링크');
+      addDynamicRow('linkInputContainer', 'link-name', 'link-url', '자료 이름', '주소(https://...)');
+      setTodayDate();
+    }
+
+    // ═══════════════════════════════════════════
+    // 📋 목록 렌더 (XSS 안전)
+    // ═══════════════════════════════════════════
+    function renderList() {
+      const list    = document.getElementById('lessonList');
+      const lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
+      const kw      = document.getElementById('searchInput').value.toLowerCase();
+
+      const filtered = lessons.filter(l => {
+        const txt = [l.date, l.song, l.overview, ...(l.chordsList||[]).map(c=>c.name)].join(' ').toLowerCase();
+        return txt.includes(kw);
+      });
+
+      list.innerHTML = filtered.map(lesson => {
+        const chordsHtml = (lesson.chordsList || []).filter(c => c.name).length > 0
+          ? `<div class="chord-grid">${(lesson.chordsList).filter(c=>c.name).map(c => {
+              const safe = safeUrl(c.link);
+              return `<div class="chord-card">
+                <p>${esc(c.name)}</p>
+                ${safe !== '#' ? `<a href="${esc(safe)}" target="_blank" rel="noopener noreferrer" class="chord-link-btn">🖼️ 보기</a>` : ''}
+              </div>`;
+            }).join('')}</div>` : '';
+
+        const linksHtml = (lesson.linksList || []).filter(l => l.name || l.url).length > 0
+          ? `<div class="link-list-wrap"><strong>📁 참고 자료:</strong><br>
+              ${(lesson.linksList).filter(l=>l.name||l.url).map(l => {
+                const safe = safeUrl(l.url);
+                return `<a href="${esc(safe)}" target="_blank" rel="noopener noreferrer" class="link-item">🔗 ${esc(l.name || '링크')}</a>`;
+              }).join('')}
+             </div>` : '';
+
+        return `<div class="record-item">
+          <div class="record-header" onclick="toggleDetails(${lesson.id})">
+            <h3>📅 ${esc(lesson.date)}</h3>
+            ${lesson.song ? `<span class="song-badge">🎵 ${escNl(lesson.song)}</span>` : ''}
+          </div>
+          <div class="record-details" id="details-${lesson.id}">
+            <p><strong>📝 배운 내용:</strong><br>${escNl(lesson.overview)}</p>
+            ${lesson.tips     ? `<p><strong>💡 꿀팁:</strong><br>${escNl(lesson.tips)}</p>` : ''}
+            ${chordsHtml}
+            ${lesson.homework ? `<p style="color:var(--danger);"><strong>🔥 과제:</strong><br>${escNl(lesson.homework)}</p>` : ''}
+            ${lesson.selfNote ? `<p style="color:var(--accent-blue);"><strong>💭 나의 연습 일기:</strong><br>${escNl(lesson.selfNote)}</p>` : ''}
+            ${linksHtml}
+            <div class="action-btns">
+              <button class="edit-btn"   onclick="editLesson(${lesson.id})">수정</button>
+              <button class="delete-btn" onclick="deleteLesson(${lesson.id})">삭제</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
     }
 
     function toggleDetails(id) {
-      const details = document.getElementById(`details-${id}`);
-      details.style.display = details.style.display === 'block' ? 'none' : 'block';
+      const d = document.getElementById(`details-${id}`);
+      d.style.display = d.style.display === 'block' ? 'none' : 'block';
     }
 
     function editLesson(id) {
-      let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
+      const lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
       const l = lessons.find(l => l.id === id);
-      document.getElementById('date').value = l.date;
-      document.getElementById('song').value = l.song || '';
+      if (!l) return;
+
+      document.getElementById('date').value     = l.date     || '';
+      document.getElementById('song').value     = l.song     || '';
       document.getElementById('overview').value = l.overview || '';
-      document.getElementById('tips').value = l.tips || '';
+      document.getElementById('tips').value     = l.tips     || '';
       document.getElementById('homework').value = l.homework || '';
       document.getElementById('selfNote').value = l.selfNote || '';
-      
-      const chordContainer = document.getElementById('chordInputContainer');
-      chordContainer.innerHTML = '';
-      if(l.chordsList && l.chordsList.length > 0) l.chordsList.forEach(c => addDynamicRow('chordInputContainer', 'chord-name', 'chord-link', '코드', '이미지 링크', c.name, c.link));
-      else addDynamicRow('chordInputContainer', 'chord-name', 'chord-link', '코드', '이미지 링크');
 
-      const linkContainer = document.getElementById('linkInputContainer');
-      linkContainer.innerHTML = '';
-      if(l.linksList && l.linksList.length > 0) l.linksList.forEach(link => addDynamicRow('linkInputContainer', 'link-name', 'link-url', '자료 이름', '주소(https://...)', link.name, link.url));
-      else addDynamicRow('linkInputContainer', 'link-name', 'link-url', '자료 이름', '주소(https://...)');
+      const cc = document.getElementById('chordInputContainer');
+      cc.innerHTML = '';
+      (l.chordsList && l.chordsList.length ? l.chordsList : [{}]).forEach(c =>
+        addDynamicRow('chordInputContainer', 'chord-name', 'chord-link', '코드명', '이미지 링크', c.name||'', c.link||'')
+      );
+
+      const lc = document.getElementById('linkInputContainer');
+      lc.innerHTML = '';
+      (l.linksList && l.linksList.length ? l.linksList : [{}]).forEach(link =>
+        addDynamicRow('linkInputContainer', 'link-name', 'link-url', '자료 이름', '주소(https://...)', link.name||'', link.url||'')
+      );
 
       editTargetId = id;
       document.getElementById('saveBtn').innerText = '✨ 수정 완료하기';
@@ -348,32 +534,123 @@
     }
 
     function deleteLesson(id) {
-      if(confirm('삭제할까요?')) {
-        let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
-        localStorage.setItem('guitarLessons', JSON.stringify(lessons.filter(l => l.id !== id)));
-        renderList(); updateEncyclopedia();
-      }
+      if (!confirm('이 레슨 기록을 삭제할까요?')) return;
+      let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
+      localStorage.setItem('guitarLessons', JSON.stringify(lessons.filter(l => l.id !== id)));
+      renderList();
+      updateEncyclopedia();
+      showToast('🗑️ 삭제됐어요', 'warning');
     }
 
+    // ═══════════════════════════════════════════
+    // 💾 백업 / 복구
+    // ═══════════════════════════════════════════
     function exportData() {
       const data = localStorage.getItem('guitarLessons');
-      if(!data) { alert('데이터 없음'); return; }
+      if (!data) { showToast('저장된 데이터가 없어요', 'error'); return; }
       const blob = new Blob([data], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `guitar_backup.json`;
+      const a    = document.createElement('a');
+      a.href     = URL.createObjectURL(blob);
+      const today = new Date().toISOString().split('T')[0];
+      a.download = `guitar_backup_${today}.json`;
       a.click();
+      localStorage.setItem('lastBackupDate', String(Date.now()));
+      document.getElementById('backupBanner').style.display = 'none';
+      showToast('💾 백업 파일 저장 완료!', 'success');
     }
 
     function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
       const reader = new FileReader();
       reader.onload = (e) => {
-        localStorage.setItem('guitarLessons', e.target.result);
-        renderList(); updateEncyclopedia();
-        alert('복구 완료!');
+        try {
+          JSON.parse(e.target.result); // 유효성 검사
+          localStorage.setItem('guitarLessons', e.target.result);
+          renderList();
+          updateEncyclopedia();
+          showToast('✅ 복구 완료!', 'success');
+        } catch {
+          showToast('❌ 파일이 올바르지 않아요', 'error');
+        }
       };
-      reader.readAsText(event.target.files[0]);
+      reader.readAsText(file);
+      event.target.value = '';
     }
+
+    // ═══════════════════════════════════════════
+    // 📱 PWA — manifest 동적 주입
+    // ═══════════════════════════════════════════
+    function injectManifest() {
+      const manifest = {
+        name: '501호 오픈 마이크',
+        short_name: '501호 레슨',
+        start_url: '.',
+        display: 'standalone',
+        background_color: '#f4f5f7',
+        theme_color: '#222222',
+        icons: [
+          { src: 'https://i.postimg.cc/C1bnY8Ln/IMG-6011.jpg', sizes: '192x192', type: 'image/jpeg' },
+          { src: 'https://i.postimg.cc/C1bnY8Ln/IMG-6011.jpg', sizes: '512x512', type: 'image/jpeg' }
+        ]
+      };
+      const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = URL.createObjectURL(blob);
+      document.head.appendChild(link);
+    }
+
+    // ═══════════════════════════════════════════
+    // 📡 Service Worker 등록
+    // ═══════════════════════════════════════════
+    function registerServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
+      // SW 코드를 Blob으로 만들어 등록 (별도 파일 불필요)
+      const swCode = `
+        const CACHE = 'guitar-lesson-v1';
+        const ASSETS = [self.location.pathname || '/'];
+        self.addEventListener('install', e => {
+          e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+          self.skipWaiting();
+        });
+        self.addEventListener('activate', e => {
+          e.waitUntil(caches.keys().then(keys =>
+            Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+          ));
+          self.clients.claim();
+        });
+        self.addEventListener('fetch', e => {
+          e.respondWith(
+            caches.match(e.request).then(cached => cached || fetch(e.request).catch(() => cached))
+          );
+        });
+      `;
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      const swUrl = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(swUrl).catch(() => {
+        // Blob SW는 일부 브라우저에서 scope 제한 — 조용히 무시
+      });
+    }
+
+    // ═══════════════════════════════════════════
+    // 🚀 초기화
+    // ═══════════════════════════════════════════
+    window.onload = () => {
+      initTheme();
+      setTodayDate();
+      checkBackupReminder();
+      renderList();
+      updateEncyclopedia();
+      injectManifest();
+      registerServiceWorker();
+
+      if (!document.querySelector('#chordInputContainer .dynamic-input-row'))
+        addDynamicRow('chordInputContainer', 'chord-name', 'chord-link', '코드명', '이미지 링크');
+      if (!document.querySelector('#linkInputContainer .dynamic-input-row'))
+        addDynamicRow('linkInputContainer', 'link-name', 'link-url', '자료 이름', '주소(https://...)');
+    };
   </script>
+
 </body>
 </html>
