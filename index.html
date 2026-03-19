@@ -50,8 +50,8 @@
     input[type="date"] { height: 52px; }
     #song { height: 80px; resize: none; }
 
-    .chord-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
-    .chord-input-row input { margin: 0; }
+    .dynamic-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .dynamic-input-row input { margin: 0; }
     .add-row-btn { background: var(--input-bg); color: var(--text-sub); text-align: center; padding: 12px; border-radius: 10px; font-size: 0.9em; font-weight: 700; cursor: pointer; margin-bottom: 15px; }
 
     .chord-encyclopedia { margin: 20px 0; padding: 20px; background: var(--input-bg); border-radius: 16px; display: none; }
@@ -84,6 +84,10 @@
     .data-btns { display: flex; gap: 10px; margin-top: 15px; justify-content: center; align-items: stretch; }
     .data-btns button, .import-label { flex: 1; height: 48px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; font-size: 0.9em; font-weight: 700; cursor: pointer; color: var(--text-main); display: flex; align-items: center; justify-content: center; margin: 0; padding: 0; box-sizing: border-box; }
     .import-label { margin-bottom: 0 !important; cursor: pointer; }
+
+    /* 링크 목록 스타일 */
+    .link-list-wrap { margin-top: 10px; }
+    .link-item { display: inline-block; background: var(--input-bg); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 8px; margin-right: 6px; margin-bottom: 6px; font-size: 0.85em; text-decoration: none; color: var(--accent-blue); font-weight: 600; }
   </style>
 </head>
 <body data-theme="light">
@@ -110,7 +114,7 @@
 
     <label>🎸 새로 배운 코드</label>
     <div id="chordInputContainer"></div>
-    <div class="add-row-btn" onclick="addChordRow()">+ 코드 칸 추가하기</div>
+    <div class="add-row-btn" onclick="addDynamicRow('chordInputContainer', 'chord-name', 'chord-link', '코드', '이미지 링크')">+ 코드 칸 추가하기</div>
 
     <label>🔥 다음 주 과제</label>
     <textarea id="homework" placeholder="이번 주 숙제는?"></textarea>
@@ -118,8 +122,9 @@
     <label>💭 나의 연습 일기 & 궁금증</label>
     <textarea id="selfNote" placeholder="연습하며 느낀 점, 질문 등"></textarea>
 
-    <label>🔗 참고 자료 (드라이브 링크)</label>
-    <input type="text" id="driveLink" placeholder="https://...">
+    <label>🔗 참고 자료 (여러 개 등록 가능)</label>
+    <div id="linkInputContainer"></div>
+    <div class="add-row-btn" onclick="addDynamicRow('linkInputContainer', 'link-name', 'link-url', '자료 이름', '주소(https://...)')">+ 자료 링크 추가하기</div>
 
     <button id="saveBtn" onclick="saveLesson()">누가 그랬던가 잊혀져 간다는 게 일부러 그런 건 아닙디다</button>
 
@@ -151,7 +156,8 @@
       initTheme();
       renderList();
       updateEncyclopedia();
-      if(document.getElementById('chordInputContainer').innerHTML === "") addChordRow();
+      if(document.getElementById('chordInputContainer').innerHTML === "") addDynamicRow('chordInputContainer', 'chord-name', 'chord-link', '코드', '이미지 링크');
+      if(document.getElementById('linkInputContainer').innerHTML === "") addDynamicRow('linkInputContainer', 'link-name', 'link-url', '자료 이름', '주소(https://...)');
     };
 
     function initTheme() {
@@ -181,7 +187,6 @@
       }
     }
 
-    // 👇 이 부분에서 .toUpperCase()를 제거하여 대소문자를 유지합니다.
     function updateEncyclopedia() {
       const lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
       const encyGrid = document.getElementById('encyGrid');
@@ -190,12 +195,12 @@
       lessons.forEach(l => {
         if(l.chordsList) {
           l.chordsList.forEach(c => {
-            const name = c.name.trim(); // .toUpperCase() 삭제
+            const name = c.name.trim();
             if(name && !chordMap.has(name)) { chordMap.set(name, c.link || ''); }
           });
         }
       });
-      const sortedKeys = Array.from(chordMap.keys()).sort((a, b) => a.localeCompare(b)); // 대소문자 섞인 정렬 대응
+      const sortedKeys = Array.from(chordMap.keys()).sort((a, b) => a.localeCompare(b));
       encyCount.innerText = `${sortedKeys.length}개`;
       encyGrid.innerHTML = sortedKeys.map(name => {
         const link = chordMap.get(name);
@@ -203,12 +208,13 @@
       }).join('');
     }
 
-    function addChordRow(nameStr = '', linkStr = '') {
-      const container = document.getElementById('chordInputContainer');
+    // 공통 행 추가 함수
+    function addDynamicRow(containerId, nameClass, linkClass, namePh, linkPh, nameVal = '', linkVal = '') {
+      const container = document.getElementById(containerId);
       const row = document.createElement('div');
-      row.className = 'chord-input-row';
-      row.innerHTML = `<input type="text" class="chord-name" placeholder="코드" value="${nameStr}">
-                       <input type="text" class="chord-link" placeholder="링크" value="${linkStr}">`;
+      row.className = 'dynamic-input-row';
+      row.innerHTML = `<input type="text" class="${nameClass}" placeholder="${namePh}" value="${nameVal}">
+                       <input type="text" class="${linkClass}" placeholder="${linkPh}" value="${linkVal}">`;
       container.appendChild(row);
     }
 
@@ -219,11 +225,11 @@
       const tips = document.getElementById('tips').value;
       const homework = document.getElementById('homework').value;
       const selfNote = document.getElementById('selfNote').value;
-      const driveLink = document.getElementById('driveLink').value;
 
       if(!date || !overview) { alert('날짜와 내용은 필수!'); return; }
 
-      const chordRows = document.querySelectorAll('.chord-input-row');
+      // 코드 리스트 추출
+      const chordRows = document.querySelectorAll('#chordInputContainer .dynamic-input-row');
       let chordsList = [];
       chordRows.forEach(row => {
         const name = row.querySelector('.chord-name').value;
@@ -231,24 +237,38 @@
         if (name || link) chordsList.push({ name, link });
       });
 
+      // 참고 자료 리스트 추출
+      const linkRows = document.querySelectorAll('#linkInputContainer .dynamic-input-row');
+      let linksList = [];
+      linkRows.forEach(row => {
+        const name = row.querySelector('.link-name').value;
+        const url = row.querySelector('.link-url').value;
+        if (name || url) linksList.push({ name, url });
+      });
+
       let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
+      const lessonData = { id: editTargetId || Date.now(), date, song, overview, tips, chordsList, linksList, homework, selfNote };
+
       if (editTargetId) {
         const index = lessons.findIndex(l => l.id === editTargetId);
-        if (index !== -1) lessons[index] = { id: editTargetId, date, song, overview, tips, chordsList, homework, selfNote, driveLink };
+        if (index !== -1) lessons[index] = lessonData;
         editTargetId = null;
         document.getElementById('saveBtn').innerText = '누가 그랬던가 잊혀져 간다는 게 일부러 그런 건 아닙디다';
       } else {
-        lessons.unshift({ id: Date.now(), date, song, overview, tips, chordsList, homework, selfNote, driveLink });
+        lessons.unshift(lessonData);
       }
 
       localStorage.setItem('guitarLessons', JSON.stringify(lessons));
       renderList();
       updateEncyclopedia();
       
+      // 초기화
       document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
       document.getElementById('date').value = '';
       document.getElementById('chordInputContainer').innerHTML = '';
-      addChordRow();
+      document.getElementById('linkInputContainer').innerHTML = '';
+      addDynamicRow('chordInputContainer', 'chord-name', 'chord-link', '코드', '이미지 링크');
+      addDynamicRow('linkInputContainer', 'link-name', 'link-url', '자료 이름', '주소(https://...)');
     }
 
     function renderList() {
@@ -270,15 +290,23 @@
             <div class="record-details" id="details-${lesson.id}">
               <p><strong>📝 배운 내용:</strong><br>${lesson.overview.replace(/\n/g, '<br>')}</p>
               ${lesson.tips ? `<p><strong>💡 꿀팁:</strong><br>${lesson.tips.replace(/\n/g, '<br>')}</p>` : ''}
+              
               ${lesson.chordsList && lesson.chordsList.length > 0 ? `
                 <div class="chord-grid">${lesson.chordsList.map(c => `
                   <div class="chord-card">
                     <p>${c.name}</p>
                     ${c.link ? `<a href="${c.link}" target="_blank" class="chord-link-btn">🖼️ 보기</a>` : ''}
                   </div>`).join('')}</div>` : ''}
+              
               ${lesson.homework ? `<p style="color:#ff4d4f;"><strong>🔥 과제:</strong><br>${lesson.homework.replace(/\n/g, '<br>')}</p>` : ''}
               ${lesson.selfNote ? `<p style="color:var(--accent-blue);"><strong>💭 나의 연습 일기:</strong><br>${lesson.selfNote.replace(/\n/g, '<br>')}</p>` : ''}
-              ${lesson.driveLink ? `<a href="${lesson.driveLink}" target="_blank" style="display:inline-block; margin-top:10px; font-size:0.85em; color:var(--accent-blue);">📁 참고 자료 링크</a>` : ''}
+              
+              ${lesson.linksList && lesson.linksList.length > 0 ? `
+                <div class="link-list-wrap">
+                  <strong>📁 참고 자료:</strong><br>
+                  ${lesson.linksList.map(l => `<a href="${l.url}" target="_blank" class="link-item">🔗 ${l.name || '링크'}</a>`).join('')}
+                </div>` : ''}
+
               <div class="action-btns">
                 <button class="edit-btn" onclick="editLesson(${lesson.id})">수정</button>
                 <button class="delete-btn" onclick="deleteLesson(${lesson.id})">삭제</button>
@@ -303,11 +331,17 @@
       document.getElementById('tips').value = l.tips || '';
       document.getElementById('homework').value = l.homework || '';
       document.getElementById('selfNote').value = l.selfNote || '';
-      document.getElementById('driveLink').value = l.driveLink || '';
-      const container = document.getElementById('chordInputContainer');
-      container.innerHTML = '';
-      if(l.chordsList) l.chordsList.forEach(c => addChordRow(c.name, c.link));
-      else addChordRow();
+      
+      const chordContainer = document.getElementById('chordInputContainer');
+      chordContainer.innerHTML = '';
+      if(l.chordsList && l.chordsList.length > 0) l.chordsList.forEach(c => addDynamicRow('chordInputContainer', 'chord-name', 'chord-link', '코드', '이미지 링크', c.name, c.link));
+      else addDynamicRow('chordInputContainer', 'chord-name', 'chord-link', '코드', '이미지 링크');
+
+      const linkContainer = document.getElementById('linkInputContainer');
+      linkContainer.innerHTML = '';
+      if(l.linksList && l.linksList.length > 0) l.linksList.forEach(link => addDynamicRow('linkInputContainer', 'link-name', 'link-url', '자료 이름', '주소(https://...)', link.name, link.url));
+      else addDynamicRow('linkInputContainer', 'link-name', 'link-url', '자료 이름', '주소(https://...)');
+
       editTargetId = id;
       document.getElementById('saveBtn').innerText = '✨ 수정 완료하기';
       window.scrollTo({ top: 0, behavior: 'smooth' });
