@@ -49,6 +49,7 @@
 
     input[type="date"] { height: 52px; }
     #song { height: 80px; resize: none; }
+    #driveLink { height: 80px; resize: none; } /* 참고 자료 입력창 높이 조정 */
 
     .chord-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
     .chord-input-row input { margin: 0; }
@@ -75,6 +76,11 @@
     .song-badge { font-size: 0.8em; background: var(--input-bg); color: var(--text-sub); padding: 4px 10px; border-radius: 12px; white-space: pre-wrap; word-break: break-all; text-align: left; }
     .record-details { margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); display: none; }
     .record-item p { font-size: 0.95em; color: var(--text-main); margin: 12px 0; line-height: 1.6;}
+    
+    /* 멀티 링크 스타일 */
+    .multi-links-wrap { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .drive-link-item { font-size: 0.8em; background: #eef5ff; color: var(--accent-blue); padding: 6px 12px; border-radius: 8px; text-decoration: none; font-weight: 600; border: 1px solid #d0e3ff; }
+
     .action-btns { margin-top: 20px; text-align: right; border-top: 1px solid var(--border-color); padding-top: 15px; }
     .edit-btn, .delete-btn { border: none; font-size: 0.85em; padding: 8px 12px; border-radius: 8px; font-weight: 600; margin-left: 5px; }
     .edit-btn { color: var(--text-main); background: var(--input-bg); }
@@ -100,7 +106,7 @@
     <input type="date" id="date">
 
     <label>🎵 곡명 (연습곡)</label>
-    <textarea id="song" placeholder="예: 변하은 - 기지개&#10;다음 곡 - 제목"></textarea>
+    <textarea id="song" placeholder="한 줄에 한 곡씩 입력 가능"></textarea>
 
     <label>📝 오늘 배운 내용</label>
     <textarea id="overview" placeholder="배운 기술이나 이론"></textarea>
@@ -118,8 +124,8 @@
     <label>💭 나의 연습 일기 & 궁금증</label>
     <textarea id="selfNote" placeholder="연습하며 느낀 점, 질문 등"></textarea>
 
-    <label>🔗 참고 자료 (드라이브 링크)</label>
-    <input type="text" id="driveLink" placeholder="https://...">
+    <label>🔗 참고 자료 (여러 개 가능)</label>
+    <textarea id="driveLink" placeholder="링크를 엔터(줄바꿈)로 구분해서 입력하세요."></textarea>
 
     <button id="saveBtn" onclick="saveLesson()">누가 그랬던가 잊혀져 간다는 게 일부러 그런 건 아닙디다</button>
 
@@ -181,7 +187,6 @@
       }
     }
 
-    // 👇 이 부분에서 .toUpperCase()를 제거하여 대소문자를 유지합니다.
     function updateEncyclopedia() {
       const lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
       const encyGrid = document.getElementById('encyGrid');
@@ -190,12 +195,12 @@
       lessons.forEach(l => {
         if(l.chordsList) {
           l.chordsList.forEach(c => {
-            const name = c.name.trim(); // .toUpperCase() 삭제
+            const name = c.name.trim();
             if(name && !chordMap.has(name)) { chordMap.set(name, c.link || ''); }
           });
         }
       });
-      const sortedKeys = Array.from(chordMap.keys()).sort((a, b) => a.localeCompare(b)); // 대소문자 섞인 정렬 대응
+      const sortedKeys = Array.from(chordMap.keys()).sort((a, b) => a.localeCompare(b));
       encyCount.innerText = `${sortedKeys.length}개`;
       encyGrid.innerHTML = sortedKeys.map(name => {
         const link = chordMap.get(name);
@@ -261,6 +266,17 @@
         let txt = (l.date + (l.song||'') + (l.overview||'') + (l.chordsList?l.chordsList.map(c=>c.name).join(''):'')).toLowerCase();
         return txt.includes(keyword);
       }).forEach(lesson => {
+        // 링크 처리 로직
+        let linkHTML = '';
+        if(lesson.driveLink) {
+          const links = lesson.driveLink.split('\n').filter(url => url.trim() !== '');
+          if(links.length > 0) {
+            linkHTML = `<div class="multi-links-wrap">` + 
+              links.map((url, idx) => `<a href="${url.trim()}" target="_blank" class="drive-link-item">📁 링크 ${idx+1}</a>`).join('') + 
+              `</div>`;
+          }
+        }
+
         let content = `
           <div class="record-item">
             <div class="record-header" onclick="toggleDetails(${lesson.id})">
@@ -278,7 +294,7 @@
                   </div>`).join('')}</div>` : ''}
               ${lesson.homework ? `<p style="color:#ff4d4f;"><strong>🔥 과제:</strong><br>${lesson.homework.replace(/\n/g, '<br>')}</p>` : ''}
               ${lesson.selfNote ? `<p style="color:var(--accent-blue);"><strong>💭 나의 연습 일기:</strong><br>${lesson.selfNote.replace(/\n/g, '<br>')}</p>` : ''}
-              ${lesson.driveLink ? `<a href="${lesson.driveLink}" target="_blank" style="display:inline-block; margin-top:10px; font-size:0.85em; color:var(--accent-blue);">📁 참고 자료 링크</a>` : ''}
+              ${linkHTML}
               <div class="action-btns">
                 <button class="edit-btn" onclick="editLesson(${lesson.id})">수정</button>
                 <button class="delete-btn" onclick="deleteLesson(${lesson.id})">삭제</button>
