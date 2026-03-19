@@ -133,7 +133,7 @@
       if(name) chords.push({ name, link });
     });
 
-    // 자료 링크 데이터 수집
+    // 참고 자료 데이터 수집 (제목과 링크 모두 수집)
     const resources = [];
     document.querySelectorAll('#resourceContainer .dynamic-row').forEach(row => {
       const name = row.querySelector('.name-input').value;
@@ -154,7 +154,7 @@
     }
 
     localStorage.setItem('guitarLessons', JSON.stringify(lessons));
-    location.reload(); // 깔끔한 리셋을 위해 새로고침
+    location.reload(); 
   }
 
   function renderList() {
@@ -172,7 +172,7 @@
         </div>
         <div class="record-details" id="details-${l.id}">
           <p><strong>📝 내용:</strong><br>${l.overview.replace(/\n/g, '<br>')}</p>
-          ${l.tips ? `<p><strong>💡 스승님의 특급 꿀팁:</strong><br>${l.tips.replace(/\n/g, '<br>')}</p>` : ''}
+          ${l.tips ? `<p><strong>💡 꿀팁:</strong><br>${l.tips.replace(/\n/g, '<br>')}</p>` : ''}
           
           ${l.chords && l.chords.length > 0 ? `<div class="chord-grid">` + 
             l.chords.map(c => `<div class="chord-card"><p>${c.name}</p>${c.link ? `<a href="${c.link}" target="_blank" class="mini-link-btn">보기</a>` : ''}</div>`).join('') + `</div>` : ''}
@@ -193,7 +193,7 @@
 
   function toggleDetails(id) {
     const el = document.getElementById(`details-${id}`);
-    el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    if (el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
   }
 
   function editLesson(id) {
@@ -208,10 +208,18 @@
     document.getElementById('homework').value = l.homework;
 
     document.getElementById('chordContainer').innerHTML = '';
-    if(l.chords) l.chords.forEach(c => addRow('chordContainer', '코드명', '링크', c.name, c.link));
+    if(l.chords && l.chords.length > 0) {
+      l.chords.forEach(c => addRow('chordContainer', '코드명(Ab)', '링크', c.name, c.link));
+    } else {
+      addRow('chordContainer', '코드명(Ab)', '링크');
+    }
     
     document.getElementById('resourceContainer').innerHTML = '';
-    if(l.resources) l.resources.forEach(r => addRow('resourceContainer', '자료 이름', '링크', r.name, r.link));
+    if(l.resources && l.resources.length > 0) {
+      l.resources.forEach(r => addRow('resourceContainer', '자료 이름', '링크', r.name, r.link));
+    } else {
+      addRow('resourceContainer', '자료 이름', '링크');
+    }
 
     editTargetId = id;
     document.getElementById('saveBtn').innerText = '✨ 수정 완료하기';
