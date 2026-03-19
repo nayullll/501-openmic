@@ -5,235 +5,469 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>501호 오픈 마이크</title>
+  
   <link rel="apple-touch-icon" href="https://i.postimg.cc/C1bnY8Ln/IMG-6011.jpg?v=8">
 
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
-    body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 20px; background-color: #f4f5f7; display: flex; justify-content: center; color: #333; }
-    .app-box { width: 100%; max-width: 450px; background: #ffffff; padding: 30px; border-radius: 24px; box-sizing: border-box; shadow: 0 15px 35px rgba(0,0,0,0.05); }
-    .main-image { width: 100%; height: 200px; object-fit: cover; border-radius: 16px; margin-bottom: 20px; }
-    h2 { color: #111; text-align: center; font-size: 1.6em; font-weight: 800; margin: 0 0 20px 0; letter-spacing: -0.5px; }
+    body { 
+      font-family: 'Pretendard', sans-serif; 
+      margin: 0; 
+      padding: 20px; 
+      background-color: #f4f5f7; 
+      display: flex; 
+      justify-content: center; 
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    .app-box { 
+      width: 100%;
+      max-width: 450px; 
+      background: #ffffff; 
+      padding: 30px; 
+      border-radius: 24px; 
+      box-sizing: border-box; 
+      box-shadow: 0 15px 35px rgba(0,0,0,0.05); 
+      position: relative;
+    }
+
+    .main-image {
+      width: 100%;
+      height: 200px; 
+      object-fit: cover; 
+      border-radius: 16px; 
+      margin-bottom: 20px; 
+    }
+
+    .title-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      margin-bottom: 5px;
+    }
+
+    h2 { color: #111; text-align: center; font-size: 1.6em; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
     
-    label { font-weight: 600; color: #666; font-size: 0.85em; margin-top: 20px; display: block; }
+    .refresh-btn {
+      position: absolute;
+      right: 0;
+      background: #ffffff;
+      border: 1px solid #e1e1e1;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+    }
+    .refresh-btn:active { transform: rotate(180deg) scale(0.9); background: #f4f5f7; }
+
+    label { font-weight: 600; color: #666; font-size: 0.85em; margin-top: 20px; display: block; letter-spacing: -0.3px; }
+    
     input, textarea { 
-      display: block; width: 100%; box-sizing: border-box; padding: 14px 16px; margin: 8px 0 10px 0; 
-      border: 1px solid #e1e1e1; border-radius: 12px; font-size: 16px; font-family: inherit; 
-      background: #fafafa; color: #222; transition: 0.2s;
+      display: block; 
+      width: 100%; 
+      max-width: 100%; 
+      box-sizing: border-box; 
+      padding: 14px 16px; 
+      margin: 8px 0 15px 0; 
+      border: 1px solid #e1e1e1; 
+      border-radius: 12px; 
+      font-size: 16px; 
+      font-family: inherit; 
+      background: #fafafa;
+      color: #222;
+      -webkit-appearance: none; 
+      appearance: none;
+      transition: 0.2s;
     }
     input:focus, textarea:focus { outline: none; border-color: #222; background: #fff; }
-    textarea { height: 80px; resize: none; }
+    input { height: 50px; } 
+    textarea { height: 100px; resize: none; line-height: 1.5; }
 
-    /* 입력 행 스타일 (코드 & 링크 공통) */
-    .dynamic-row { display: flex; gap: 8px; margin-bottom: 8px; }
-    .dynamic-row input { margin: 0; }
-    .name-input { flex: 1.2; }
-    .link-input { flex: 2; }
+    .chord-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .chord-input-row input { margin: 0; }
+    .chord-input-row .chord-name { flex: 1; } 
+    .chord-input-row .chord-link { flex: 2; } 
     
-    .add-btn { background: #f0f0f0; color: #555; text-align: center; padding: 10px; border-radius: 10px; font-size: 0.85em; font-weight: 700; cursor: pointer; margin-bottom: 15px; }
-
-    /* 코드 그리드 (작고 앙증맞은 사이즈) */
-    .chord-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; background: #fafafa; padding: 10px; border-radius: 12px; }
-    .chord-card { 
-      background: #EDA18C; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; 
-      aspect-ratio: 1 / 1; box-sizing: border-box; padding: 5px; text-align: center; min-width: 0;
+    .add-row-btn {
+      background: #f0f0f0; color: #555; text-align: center; padding: 12px; 
+      border-radius: 10px; font-size: 0.9em; font-weight: 700; cursor: pointer; 
+      margin-top: 5px; margin-bottom: 15px; transition: 0.2s;
     }
-    .chord-card p { margin: 0; font-weight: 800; font-size: 1.05em; color: white; word-break: break-all; }
-    .mini-link-btn { margin-top: 5px; padding: 3px 6px; background: white; color: #EDA18C; text-decoration: none; border-radius: 5px; font-size: 0.7em; font-weight: 800; white-space: nowrap; }
+    .add-row-btn:hover { background: #e5e5e5; color: #222; }
 
-    /* 참고 자료 링크 버튼 스타일 */
-    .resource-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-    .res-btn { background: #eef5ff; color: #1976D2; padding: 8px 14px; border-radius: 10px; text-decoration: none; font-size: 0.85em; font-weight: 700; border: 1px solid #d0e3ff; }
-
-    #saveBtn { width: 100%; padding: 16px; margin-top: 20px; background: #222; color: white; border: none; border-radius: 14px; font-size: 1em; font-weight: 700; cursor: pointer; }
+    /* 👇 그리드 간격과 패딩을 다이어트시켜서 쏙 들어가게 만들었습니다 */
+    .chord-grid { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); 
+      gap: 6px; 
+      margin-top: 10px; 
+      background: #fafafa; 
+      padding: 10px; 
+      border-radius: 12px; 
+      width: 100%;
+      box-sizing: border-box;
+    }
     
-    .record-item { background: #fff; border: 1px solid #eaeaea; padding: 20px; margin-top: 15px; border-radius: 16px; }
-    .record-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-    .record-header h3 { margin: 0; font-size: 1.1em; font-weight: 800; }
-    .song-badge { font-size: 0.8em; background: #f0f0f0; padding: 4px 10px; border-radius: 12px; color: #555; }
-    .record-details { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee; display: none; }
-    .record-details p { font-size: 0.95em; line-height: 1.6; margin: 10px 0; }
+    /* 👇 비율을 정사각형으로 맞추고(aspect-ratio), 넘침 방지(min-width, word-break) 코드를 넣었습니다 */
+    .chord-card { 
+      background: #EDA18C; 
+      border-radius: 10px; 
+      padding: 8px 4px; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      align-items: center; 
+      box-sizing: border-box; 
+      text-align: center; 
+      box-shadow: 0 4px 10px rgba(237, 161, 140, 0.3); 
+      aspect-ratio: 1 / 1; 
+      min-width: 0; /* 넘침 방지 핵심 코드 */
+    }
+    
+    /* 👇 박스 크기에 맞춰 글씨 크기를 약간 줄이고, 넘치면 자동 줄바꿈(word-break) 되게 했습니다 */
+    .chord-card p { 
+      margin: 0; 
+      font-weight: 800; 
+      font-size: 1.1em; 
+      color: white; 
+      word-break: break-all;
+    }
+    
+    /* 👇 버튼 크기도 앙증맞게 줄였습니다 */
+    .chord-link-btn { 
+      display: inline-block; 
+      margin-top: 6px; 
+      padding: 4px 6px; 
+      background: #ffffff; 
+      color: #EDA18C; 
+      text-decoration: none; 
+      border-radius: 6px; 
+      font-size: 0.75em; 
+      font-weight: 800; 
+      transition: 0.2s; 
+      white-space: nowrap; 
+      letter-spacing: -0.5px;
+    }
+    .chord-link-btn:hover { background: #f8f8f8; }
+    
+    #saveBtn { 
+      width: 100%; padding: 16px; margin-top: 15px; background-color: #222; 
+      color: white; border: none; border-radius: 14px; font-size: 1.05em; font-weight: 700; cursor: pointer; transition: 0.2s; 
+      line-height: 1.4; word-break: keep-all;
+    }
+    #saveBtn:hover { background-color: #444; }
 
-    .action-btns { margin-top: 15px; text-align: right; }
-    .edit-btn, .delete-btn { border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.8em; font-weight: 600; margin-left: 5px; cursor: pointer; }
-    .edit-btn { background: #f4f5f7; color: #555; }
-    .delete-btn { background: #fff0f0; color: #ff4d4f; }
+    .search-box { margin-top: 40px; margin-bottom: 15px; position: relative; }
+    .search-box input { background: #fff; border: 2px solid #222; font-weight: 600; }
+    .search-box input:focus { border-color: #1976D2; box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.1); }
+
+    .record-item { background: #fff; border: 1px solid #eaeaea; padding: 20px; margin-top: 15px; border-radius: 16px; position: relative; }
+    .record-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+    .record-header-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .record-header h3 { margin: 0; color: #111; font-size: 1.1em; font-weight: 800; }
+    .record-header .song-badge { font-size: 0.85em; background: #f0f0f0; color: #555; padding: 4px 10px; border-radius: 12px; font-weight: 600; }
+    .toggle-icon { font-size: 0.8em; color: #888; transition: transform 0.3s ease; }
+    .toggle-icon.open { transform: rotate(180deg); } 
+    .record-details { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee; display: none; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+    .record-item p { font-size: 0.95em; color: #333; margin: 12px 0; line-height: 1.6;}
+    .link-btn { display: inline-block; margin-top: 12px; padding: 10px 18px; background: #f4f5f7; color: #222; text-decoration: none; border-radius: 10px; font-size: 0.9em; font-weight: 700; border: 1px solid #e1e1e1;}
+    .link-btn:hover { background: #e9ecef; }
+    .action-btns { margin-top: 20px; text-align: right; border-top: 1px solid var(--border-color); padding-top: 15px; }
+    .edit-btn, .delete-btn { background: none; border: none; font-size: 0.85em; cursor: pointer; padding: 6px 12px; border-radius: 8px; font-weight: 600; margin-left: 5px; }
+    .edit-btn { color: #555; background: #f4f5f7;}
+    .edit-btn:hover { background: #e9ecef; }
+    .delete-btn { color: #ff4d4f; background: #fff0f0;}
+    .delete-btn:hover { background: #ffe5e5; }
+
+    .data-management { margin-top: 40px; padding-top: 20px; border-top: 1px dashed #ccc; text-align: center; }
+    .data-management p { font-size: 0.85em; color: #888; margin: 0 0 12px 0; font-weight: 600; }
+    .data-btns { display: flex; justify-content: space-between; gap: 10px; width: 100%; }
+    .data-btns button, .import-label { flex: 1; padding: 12px; background: #f4f5f7; border: 1px solid #e1e1e1; border-radius: 10px; font-size: 0.9em; font-weight: 700; color: #444; cursor: pointer; transition: 0.2s; margin: 0; text-align: center;}
+    .data-btns button:hover, .import-label:hover { background: #e9ecef; color: #111; }
   </style>
 </head>
 <body>
 
-<div class="app-box">
-  <img src="https://i.postimg.cc/rmfjc5Yn/IMG-6009.jpg" class="main-image">
-  <h2>🎤 501호 오픈 마이크</h2>
+  <div class="app-box" id="appBox">
+    <img src="https://i.postimg.cc/rmfjc5Yn/IMG-6009.jpg" alt="메인 사진" class="main-image">
 
-  <label>📅 레슨 날짜</label>
-  <input type="date" id="date">
-
-  <label>🎵 곡명 (연습곡)</label>
-  <input type="text" id="song" placeholder="곡 제목을 입력하세요">
-
-  <label>📝 오늘 배운 내용</label>
-  <textarea id="overview"></textarea>
-
-  <label>💡 스승님의 특급 꿀팁</label>
-  <textarea id="tips"></textarea>
-
-  <label>🎸 새로 배운 코드</label>
-  <div id="chordContainer"></div>
-  <div class="add-btn" onclick="addRow('chordContainer', '코드명(Ab)', '링크')">+ 코드 추가</div>
-
-  <label>🔗 참고 자료 (제목과 링크)</label>
-  <div id="resourceContainer"></div>
-  <div class="add-btn" onclick="addRow('resourceContainer', '자료 이름', '링크')">+ 자료 추가</div>
-
-  <label>🔥 다음 주 과제</label>
-  <textarea id="homework"></textarea>
-
-  <button id="saveBtn" onclick="saveLesson()">기록 저장하기</button>
-
-  <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
-  <div id="lessonList"></div>
-</div>
-
-<script>
-  let editTargetId = null;
-
-  window.onload = () => {
-    renderList();
-    addRow('chordContainer', '코드명(Ab)', '링크');
-    addRow('resourceContainer', '자료 이름', '링크');
-  };
-
-  // 행 추가 함수 (코드와 자료 공통 사용)
-  function addRow(containerId, p1, p2, v1 = '', v2 = '') {
-    const container = document.getElementById(containerId);
-    const row = document.createElement('div');
-    row.className = 'dynamic-row';
-    row.innerHTML = `
-      <input type="text" class="name-input" placeholder="${p1}" value="${v1}">
-      <input type="text" class="link-input" placeholder="${p2}" value="${v2}">
-    `;
-    container.appendChild(row);
-  }
-
-  function saveLesson() {
-    const date = document.getElementById('date').value;
-    const song = document.getElementById('song').value;
-    const overview = document.getElementById('overview').value;
-    const tips = document.getElementById('tips').value;
-    const homework = document.getElementById('homework').value;
-
-    if(!date || !overview) { alert('날짜와 내용은 필수입니다!'); return; }
-
-    // 코드 데이터 수집
-    const chords = [];
-    document.querySelectorAll('#chordContainer .dynamic-row').forEach(row => {
-      const name = row.querySelector('.name-input').value;
-      const link = row.querySelector('.link-input').value;
-      if(name) chords.push({ name, link });
-    });
-
-    // 참고 자료 데이터 수집 (제목과 링크 모두 수집)
-    const resources = [];
-    document.querySelectorAll('#resourceContainer .dynamic-row').forEach(row => {
-      const name = row.querySelector('.name-input').value;
-      const link = row.querySelector('.link-input').value;
-      if(name) resources.push({ name, link });
-    });
-
-    let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
-    const lessonData = { id: editTargetId || Date.now(), date, song, overview, tips, chords, resources, homework };
-
-    if(editTargetId) {
-      const idx = lessons.findIndex(l => l.id === editTargetId);
-      lessons[idx] = lessonData;
-      editTargetId = null;
-      document.getElementById('saveBtn').innerText = '기록 저장하기';
-    } else {
-      lessons.unshift(lessonData);
-    }
-
-    localStorage.setItem('guitarLessons', JSON.stringify(lessons));
-    location.reload(); 
-  }
-
-  function renderList() {
-    const list = document.getElementById('lessonList');
-    const lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
-    list.innerHTML = '';
-
-    lessons.forEach(l => {
-      const item = document.createElement('div');
-      item.className = 'record-item';
-      item.innerHTML = `
-        <div class="record-header" onclick="toggleDetails(${l.id})">
-          <h3>📅 ${l.date}</h3>
-          <span class="song-badge">${l.song || '연습곡'}</span>
-        </div>
-        <div class="record-details" id="details-${l.id}">
-          <p><strong>📝 내용:</strong><br>${l.overview.replace(/\n/g, '<br>')}</p>
-          ${l.tips ? `<p><strong>💡 꿀팁:</strong><br>${l.tips.replace(/\n/g, '<br>')}</p>` : ''}
-          
-          ${l.chords && l.chords.length > 0 ? `<div class="chord-grid">` + 
-            l.chords.map(c => `<div class="chord-card"><p>${c.name}</p>${c.link ? `<a href="${c.link}" target="_blank" class="mini-link-btn">보기</a>` : ''}</div>`).join('') + `</div>` : ''}
-          
-          ${l.resources && l.resources.length > 0 ? `<div class="resource-links">` + 
-            l.resources.map(r => `<a href="${r.link}" target="_blank" class="res-btn">📁 ${r.name}</a>`).join('') + `</div>` : ''}
-          
-          <p><strong>🔥 과제:</strong> ${l.homework || '없음'}</p>
-          <div class="action-btns">
-            <button class="edit-btn" onclick="editLesson(${l.id})">수정</button>
-            <button class="delete-btn" onclick="deleteLesson(${l.id})">삭제</button>
-          </div>
-        </div>
-      `;
-      list.appendChild(item);
-    });
-  }
-
-  function toggleDetails(id) {
-    const el = document.getElementById(`details-${id}`);
-    if (el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
-  }
-
-  function editLesson(id) {
-    const lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
-    const l = lessons.find(l => l.id === id);
-    if(!l) return;
-
-    document.getElementById('date').value = l.date;
-    document.getElementById('song').value = l.song;
-    document.getElementById('overview').value = l.overview;
-    document.getElementById('tips').value = l.tips;
-    document.getElementById('homework').value = l.homework;
-
-    document.getElementById('chordContainer').innerHTML = '';
-    if(l.chords && l.chords.length > 0) {
-      l.chords.forEach(c => addRow('chordContainer', '코드명(Ab)', '링크', c.name, c.link));
-    } else {
-      addRow('chordContainer', '코드명(Ab)', '링크');
-    }
+    <div class="title-wrap">
+      <h2>🎤 501호 오픈 마이크</h2>
+      <button class="refresh-btn" onclick="window.location.reload()">🔄</button>
+    </div>
     
-    document.getElementById('resourceContainer').innerHTML = '';
-    if(l.resources && l.resources.length > 0) {
-      l.resources.forEach(r => addRow('resourceContainer', '자료 이름', '링크', r.name, r.link));
-    } else {
-      addRow('resourceContainer', '자료 이름', '링크');
+    <label>📅 레슨 날짜</label>
+    <input type="date" id="date">
+
+    <label>🎵 곡명 (연습곡)</label>
+    <input type="text" id="song" placeholder="예: 변하은 - 기지개">
+
+    <label>📝 오늘 배운 내용</label>
+    <textarea id="overview" placeholder="sus4"></textarea>
+
+    <label>💡스승님의 특급 꿀팁</label>
+    <textarea id="tips" placeholder="연습을 너무 열심히 해선 안된다!"></textarea>
+
+    <label>🎸 새로 배운 코드</label>
+    <div id="chordInputContainer"></div>
+    <div class="add-row-btn" onclick="addChordRow()">+ 코드 칸 추가하기</div>
+
+    <label>🔥 다음 주 과제</label>
+    <textarea id="homework" placeholder="재미있다!!!"></textarea>
+
+    <label>🔗 참고 자료 (구글 드라이브 링크)</label>
+    <input type="text" id="driveLink" placeholder="예: https://drive.google.com/file/d/...">
+
+    <button id="saveBtn" onclick="saveLesson()">누가 그랬던가 잊혀져 간다는 게 일부러 그런 건 아닙디다</button>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="🔍 곡명, 내용, 코드 등으로 검색..." onkeyup="renderList()">
+    </div>
+
+    <div id="lessonList"></div>
+
+    <div class="data-management">
+      <p>💾 기록이 날아갈까 걱정된다면?</p>
+      <div class="data-btns">
+        <button onclick="exportData()">내보내기 (백업)</button>
+        <label for="importData" class="import-label">불러오기 (복구)</label>
+        <input type="file" id="importData" accept=".json" style="display:none;" onchange="importData(event)">
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let editTargetId = null; 
+
+    window.onload = () => {
+      renderList();
+      addChordRow(); 
+    };
+
+    function formatText(text) {
+      if (!text) return '';
+      return text.replace(/\n/g, '<br>');
     }
 
-    editTargetId = id;
-    document.getElementById('saveBtn').innerText = '✨ 수정 완료하기';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+    function addChordRow(nameStr = '', linkStr = '') {
+      const container = document.getElementById('chordInputContainer');
+      const row = document.createElement('div');
+      row.className = 'chord-input-row';
+      row.innerHTML = `
+        <input type="text" class="chord-name" placeholder="코드명(F)" value="${nameStr}">
+        <input type="text" class="chord-link" placeholder="구글 드라이브 링크" value="${linkStr}">
+      `;
+      container.appendChild(row);
+    }
 
-  function deleteLesson(id) {
-    if(confirm('정말 삭제할까요?')) {
+    function saveLesson() {
+      const date = document.getElementById('date').value;
+      const song = document.getElementById('song').value;
+      const overview = document.getElementById('overview').value;
+      const tips = document.getElementById('tips').value;
+      const homework = document.getElementById('homework').value;
+      const driveLink = document.getElementById('driveLink').value;
+
+      if(!date || !overview) {
+        alert('날짜와 배운 내용은 꼭 입력해 주세요!');
+        return;
+      }
+
+      const chordRows = document.querySelectorAll('.chord-input-row');
+      let chordsList = [];
+      chordRows.forEach(row => {
+        const name = row.querySelector('.chord-name').value;
+        const link = row.querySelector('.chord-link').value;
+        if (name || link) {
+          chordsList.push({ name: name, link: link });
+        }
+      });
+
       let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
-      lessons = lessons.filter(l => l.id !== id);
+
+      if (editTargetId) {
+        const index = lessons.findIndex(lesson => lesson.id === editTargetId);
+        if (index !== -1) {
+          lessons[index] = { id: editTargetId, date, song, overview, tips, chordsList, homework, driveLink };
+        }
+        editTargetId = null; 
+        document.getElementById('saveBtn').innerText = '누가 그랬던가 잊혀져 간다는 게 일부러 그런 건 아닙디다'; 
+        document.getElementById('saveBtn').style.backgroundColor = '#222'; 
+      } else {
+        const lesson = { id: Date.now(), date, song, overview, tips, chordsList, homework, driveLink };
+        lessons.unshift(lesson); 
+      }
+
       localStorage.setItem('guitarLessons', JSON.stringify(lessons));
+      
+      document.querySelectorAll('input[type="text"]:not(.chord-name):not(.chord-link), textarea').forEach(el => el.value = '');
+      document.getElementById('date').value = '';
+      document.getElementById('chordInputContainer').innerHTML = ''; 
+      addChordRow(); 
+      
       renderList();
     }
-  }
-</script>
+
+    function editLesson(id) {
+      let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
+      const lesson = lessons.find(l => l.id === id);
+      if(!lesson) return;
+
+      document.getElementById('date').value = lesson.date;
+      document.getElementById('song').value = lesson.song || '';
+      document.getElementById('overview').value = lesson.overview || '';
+      document.getElementById('tips').value = lesson.tips || '';
+      document.getElementById('homework').value = lesson.homework || '';
+      document.getElementById('driveLink').value = lesson.driveLink || '';
+
+      const container = document.getElementById('chordInputContainer');
+      container.innerHTML = ''; 
+      if (lesson.chordsList && lesson.chordsList.length > 0) {
+        lesson.chordsList.forEach(c => addChordRow(c.name, c.link || c.img)); 
+      } else {
+        addChordRow(); 
+      }
+
+      editTargetId = id; 
+      const saveBtn = document.getElementById('saveBtn');
+      saveBtn.innerText = '✨ 수정 완료하기';
+      saveBtn.style.backgroundColor = '#1976D2'; 
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteLesson(id) {
+      if(confirm('정말 이 기록을 삭제할까요? 지우면 복구할 수 없습니다!')) {
+        let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
+        lessons = lessons.filter(l => l.id !== id); 
+        localStorage.setItem('guitarLessons', JSON.stringify(lessons));
+        renderList();
+      }
+    }
+
+    function toggleDetails(id) {
+      const details = document.getElementById(`details-${id}`);
+      const icon = document.getElementById(`icon-${id}`);
+      
+      if (details.style.display === 'block') {
+        details.style.display = 'none';
+        icon.classList.remove('open');
+      } else {
+        details.style.display = 'block';
+        icon.classList.add('open');
+      }
+    }
+
+    function renderList() {
+      const list = document.getElementById('lessonList');
+      list.innerHTML = '';
+      let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
+
+      const searchInput = document.getElementById('searchInput');
+      const keyword = searchInput ? searchInput.value.toLowerCase() : '';
+
+      const filteredLessons = lessons.filter(lesson => {
+        if(!keyword) return true;
+        
+        let searchText = (lesson.date || '') + ' ' + (lesson.song || '') + ' ' + (lesson.overview || '') + ' ' + (lesson.tips || '') + ' ' + (lesson.homework || '');
+        if (lesson.chordsList) {
+          searchText += ' ' + lesson.chordsList.map(c => c.name).join(' ');
+        }
+        return searchText.toLowerCase().includes(keyword);
+      });
+
+      if(filteredLessons.length === 0 && keyword !== '') {
+        list.innerHTML = `<p style="text-align:center; color:#888; margin-top:30px; font-weight:600;">"${keyword}"에 대한 기록이 없어요! 🎸</p>`;
+        return;
+      }
+
+      filteredLessons.forEach(lesson => {
+        let content = `<div class="record-item">
+            <div class="record-header" onclick="toggleDetails(${lesson.id})">
+              <div class="record-header-left">
+                <h3>📅 ${lesson.date}</h3>
+                ${lesson.song ? `<span class="song-badge">🎵 ${lesson.song}</span>` : ''}
+              </div>
+              <div class="toggle-icon" id="icon-${lesson.id}">▼</div>
+            </div>
+            
+            <div class="record-details" id="details-${lesson.id}">
+              ${lesson.overview ? `<p><strong>📝 배운 내용:</strong><br>${formatText(lesson.overview)}</p>` : ''}
+              ${lesson.tips ? `<p><strong>💡 꿀팁 & 노하우:</strong><br>${formatText(lesson.tips)}</p>` : ''}
+              
+              ${lesson.chordsList && lesson.chordsList.length > 0 ? `<p><strong>🎸 새로 배운 코드:</strong></p><div class="chord-grid">` + 
+                lesson.chordsList.map(c => `<div class="chord-card">
+                  ${c.name ? `<p>${c.name}</p>` : ''}
+                  ${c.link || c.img ? `<a href="${c.link || c.img}" target="_blank" class="chord-link-btn">🖼️ 보기</a>` : ''}
+                </div>`).join('') + `</div>` : ''}
+              
+              ${lesson.homework ? `<p><strong>🔥 과제:</strong><br>${formatText(lesson.homework)}</p>` : ''}
+              ${lesson.driveLink ? `<a href="${lesson.driveLink}" target="_blank" class="link-btn">📁 자료 보기</a>` : ''}
+              
+              <div class="action-btns">
+                <button class="edit-btn" onclick="editLesson(${lesson.id}); toggleDetails(${lesson.id});">수정</button>
+                <button class="delete-btn" onclick="deleteLesson(${lesson.id})">삭제</button>
+              </div>
+            </div>
+          </div>`;
+        list.innerHTML += content;
+      });
+    }
+
+    function exportData() {
+      const data = localStorage.getItem('guitarLessons');
+      if (!data || data === '[]') {
+        alert('아직 저장된 기록이 없습니다!');
+        return;
+      }
+      
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `501_openmic_backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const importedLessons = JSON.parse(e.target.result);
+          if (Array.isArray(importedLessons)) {
+            if(confirm('기록을 복구하시겠습니까? (현재 화면에 있는 기록과 교체됩니다)')) {
+               localStorage.setItem('guitarLessons', JSON.stringify(importedLessons));
+               renderList();
+               alert('🎉 기록 복구가 완료되었습니다!');
+            }
+          } else {
+            alert('잘못된 백업 파일입니다.');
+          }
+        } catch (err) {
+          alert('파일을 읽는 중 오류가 발생했습니다.');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = ''; 
+    }
+  </script>
+
 </body>
 </html>
