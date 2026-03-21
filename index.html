@@ -4,576 +4,236 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="501호 레슨">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#222222">
   <title>501호 오픈 마이크</title>
   <link rel="apple-touch-icon" href="https://i.postimg.cc/C1bnY8Ln/IMG-6011.jpg?v=8">
+
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-    :root {
-      --bg-color: #f4f5f7; --card-bg: #ffffff; --text-main: #111111;
-      --text-sub: #666666; --border-color: #e1e1e1; --input-bg: #fafafa;
-      --primary-color: #222222; --accent-blue: #1976D2; --chord-orange: #EDA18C;
-      --danger: #ff4d4f; --success: #2e7d32;
-    }
-    [data-theme='dark'] {
-      --bg-color: #1a1a1a; --card-bg: #2d2d2d; --text-main: #eeeeee;
-      --text-sub: #aaaaaa; --border-color: #444444; --input-bg: #3d3d3d;
-      --primary-color: #ffffff;
-    }
-    body {
-      font-family: 'Pretendard', sans-serif; margin: 0; padding: 20px;
-      background-color: var(--bg-color); display: flex; flex-direction: column; align-items: center;
-      color: var(--text-main); transition: background-color 0.3s ease;
-    }
-    #toast {
-      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
-      background: #222; color: #fff; padding: 13px 22px; border-radius: 14px;
-      font-size: 0.9em; font-weight: 600; z-index: 9999;
-      transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), opacity 0.35s;
-      opacity: 0; pointer-events: none; white-space: nowrap;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.22);
-    }
-    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-    #toast.success { background: var(--success); }
-    #toast.warning { background: #e65100; }
-    #toast.error   { background: var(--danger); }
-    #backupBanner {
-      width: 100%; max-width: 450px; box-sizing: border-box;
-      background: #fff3e0; border: 1px solid #ffb74d; border-radius: 14px;
-      padding: 14px 18px; margin-bottom: 14px;
-      font-size: 0.88em; font-weight: 600; color: #e65100;
-      align-items: center; gap: 10px; display: none;
-    }
-    #backupBanner button {
-      margin-left: auto; background: #e65100; color: #fff;
-      border: none; border-radius: 8px; padding: 6px 12px;
-      font-size: 0.85em; font-weight: 700; cursor: pointer; white-space: nowrap;
-    }
-    .app-box {
-      width: 100%; max-width: 450px; background: var(--card-bg);
-      padding: 30px; border-radius: 24px; box-sizing: border-box;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-    }
+
+    body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 20px; background-color: #f4f5f7; display: flex; justify-content: center; color: #333; }
+    .app-box { width: 100%; max-width: 450px; background: #ffffff; padding: 30px; border-radius: 24px; box-sizing: border-box; shadow: 0 15px 35px rgba(0,0,0,0.05); }
     .main-image { width: 100%; height: 200px; object-fit: cover; border-radius: 16px; margin-bottom: 20px; }
-    .title-wrap { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-    .theme-toggle {
-      background: var(--input-bg); border: 1px solid var(--border-color);
-      width: 42px; height: 42px; border-radius: 12px; cursor: pointer;
-      font-size: 1.2em; display: flex; align-items: center; justify-content: center; padding: 0;
+    h2 { color: #111; text-align: center; font-size: 1.6em; font-weight: 800; margin: 0 0 20px 0; letter-spacing: -0.5px; }
+    
+    label { font-weight: 600; color: #666; font-size: 0.85em; margin-top: 20px; display: block; }
+    input, textarea { 
+      display: block; width: 100%; box-sizing: border-box; padding: 14px 16px; margin: 8px 0 10px 0; 
+      border: 1px solid #e1e1e1; border-radius: 12px; font-size: 16px; font-family: inherit; 
+      background: #fafafa; color: #222; transition: 0.2s;
     }
-    h2 { color: var(--text-main); font-size: 1.5em; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
-    label { font-weight: 600; color: var(--text-sub); font-size: 0.85em; margin-top: 20px; display: block; }
-    input, textarea {
-      display: block; width: 100%; box-sizing: border-box; padding: 14px 16px; margin: 8px 0 15px 0;
-      border: 1px solid var(--border-color); border-radius: 12px; font-size: 16px; font-family: inherit;
-      background: var(--input-bg); color: var(--text-main); transition: 0.2s; -webkit-appearance: none;
+    input:focus, textarea:focus { outline: none; border-color: #222; background: #fff; }
+    textarea { height: 80px; resize: none; }
+
+    /* 입력 행 스타일 (코드 & 링크 공통) */
+    .dynamic-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .dynamic-row input { margin: 0; }
+    .name-input { flex: 1.2; }
+    .link-input { flex: 2; }
+    
+    .add-btn { background: #f0f0f0; color: #555; text-align: center; padding: 10px; border-radius: 10px; font-size: 0.85em; font-weight: 700; cursor: pointer; margin-bottom: 15px; }
+
+    /* 코드 그리드 (작고 앙증맞은 사이즈) */
+    .chord-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; background: #fafafa; padding: 10px; border-radius: 12px; }
+    .chord-card { 
+      background: #EDA18C; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; 
+      aspect-ratio: 1 / 1; box-sizing: border-box; padding: 5px; text-align: center; min-width: 0;
     }
-    input:focus, textarea:focus { outline: none; border-color: var(--accent-blue); }
-    input[type="date"] { height: 52px; }
-    #song, #overview, #tips, #homework, #selfNote { resize: none; }
-    .dynamic-input-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
-    .dynamic-input-row input { margin: 0; flex: 1; }
-    .remove-row-btn {
-      flex-shrink: 0; width: 36px; height: 36px; background: #fff0f0;
-      border: 1px solid #ffd0d0; border-radius: 10px; color: var(--danger);
-      font-size: 1.1em; font-weight: 700; cursor: pointer; display: flex;
-      align-items: center; justify-content: center; padding: 0; line-height: 1;
-    }
-    .add-row-btn {
-      background: var(--input-bg); color: var(--text-sub); text-align: center;
-      padding: 12px; border-radius: 10px; font-size: 0.9em; font-weight: 700;
-      cursor: pointer; margin-bottom: 15px; border: 1px dashed var(--border-color);
-      transition: background 0.2s;
-    }
-    .chord-encyclopedia { margin: 20px 0; padding: 20px; background: var(--input-bg); border-radius: 16px; display: none; }
-    .ency-title { font-weight: 800; font-size: 1em; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-    .ency-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .ency-item { background: var(--chord-orange); border-radius: 10px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; }
-    .ency-item p { margin: 0; font-weight: 800; font-size: 0.95em; color: #ffffff !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 90%; text-align: center; }
-    .ency-link-btn { margin-top: 6px; padding: 4px 8px; background: #ffffff; color: var(--chord-orange); text-decoration: none; border-radius: 6px; font-size: 0.7em; font-weight: 800; }
-    .toggle-ency-btn { width: 100%; padding: 12px; background: var(--accent-blue); color: #fff; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
-    .chord-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; background: var(--input-bg); padding: 12px; border-radius: 12px; width: 100%; box-sizing: border-box; }
-    .chord-card { background: var(--chord-orange); border-radius: 10px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; }
-    .chord-card p { margin: 0; font-weight: 800; font-size: 1em; color: #ffffff !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 90%; text-align: center; }
-    .chord-link-btn { margin-top: 6px; padding: 4px 8px; background: #ffffff; color: var(--chord-orange); text-decoration: none; border-radius: 6px; font-size: 0.7em; font-weight: 800; }
-    #saveBtn {
-      width: 100%; padding: 16px; margin-top: 15px;
-      background-color: var(--primary-color); color: var(--card-bg);
-      border: none; border-radius: 14px; font-size: 1.05em; font-weight: 700; cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-    }
-    #saveBtn:active { opacity: 0.8; transform: scale(0.98); }
-    .record-item { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; margin-top: 15px; border-radius: 16px; }
+    .chord-card p { margin: 0; font-weight: 800; font-size: 1.05em; color: white; word-break: break-all; }
+    .mini-link-btn { margin-top: 5px; padding: 3px 6px; background: white; color: #EDA18C; text-decoration: none; border-radius: 5px; font-size: 0.7em; font-weight: 800; white-space: nowrap; }
+
+    /* 참고 자료 링크 버튼 스타일 */
+    .resource-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .res-btn { background: #eef5ff; color: #1976D2; padding: 8px 14px; border-radius: 10px; text-decoration: none; font-size: 0.85em; font-weight: 700; border: 1px solid #d0e3ff; }
+
+    #saveBtn { width: 100%; padding: 16px; margin-top: 20px; background: #222; color: white; border: none; border-radius: 14px; font-size: 1em; font-weight: 700; cursor: pointer; }
+    
+    .record-item { background: #fff; border: 1px solid #eaeaea; padding: 20px; margin-top: 15px; border-radius: 16px; }
     .record-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-    .record-header h3 { margin: 0; color: var(--text-main); font-size: 1.05em; }
-    .song-badge { font-size: 0.8em; background: var(--input-bg); color: var(--text-sub); padding: 4px 10px; border-radius: 12px; white-space: pre-wrap; word-break: break-all; text-align: left; }
-    .record-details { margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); display: none; }
-    .record-item p { font-size: 0.95em; color: var(--text-main); margin: 12px 0; line-height: 1.6; }
-    .action-btns { margin-top: 20px; text-align: right; border-top: 1px solid var(--border-color); padding-top: 15px; }
-    .edit-btn, .delete-btn { border: none; font-size: 0.85em; padding: 8px 12px; border-radius: 8px; font-weight: 600; margin-left: 5px; cursor: pointer; }
-    .edit-btn { color: var(--text-main); background: var(--input-bg); }
-    .delete-btn { color: var(--danger); background: #fff0f0; }
-    .data-management { margin-top: 40px; padding-top: 20px; border-top: 1px dashed var(--border-color); text-align: center; }
-    .data-btns { display: flex; gap: 10px; margin-top: 15px; justify-content: center; align-items: stretch; }
-    .data-btns button, .import-label {
-      flex: 1; height: 48px; background: var(--input-bg); border: 1px solid var(--border-color);
-      border-radius: 12px; font-size: 0.9em; font-weight: 700; cursor: pointer; color: var(--text-main);
-      display: flex; align-items: center; justify-content: center; margin: 0; padding: 0; box-sizing: border-box;
-    }
-    .link-list-wrap { margin-top: 10px; }
-    .link-item {
-      display: inline-block; background: var(--input-bg); border: 1px solid var(--border-color);
-      padding: 6px 12px; border-radius: 8px; margin-right: 6px; margin-bottom: 6px;
-      font-size: 0.85em; text-decoration: none; color: var(--accent-blue); font-weight: 600;
-    }
+    .record-header h3 { margin: 0; font-size: 1.1em; font-weight: 800; }
+    .song-badge { font-size: 0.8em; background: #f0f0f0; padding: 4px 10px; border-radius: 12px; color: #555; }
+    .record-details { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee; display: none; }
+    .record-details p { font-size: 0.95em; line-height: 1.6; margin: 10px 0; }
+
+    .action-btns { margin-top: 15px; text-align: right; }
+    .edit-btn, .delete-btn { border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.8em; font-weight: 600; margin-left: 5px; cursor: pointer; }
+    .edit-btn { background: #f4f5f7; color: #555; }
+    .delete-btn { background: #fff0f0; color: #ff4d4f; }
   </style>
 </head>
-<body data-theme="light">
+<body>
 
-  <div id="backupBanner">
-    <span>&#9888;&#65039; 마지막 백업으로부터 7일이 지났어요!</span>
-    <button onclick="exportData()">지금 백업</button>
-  </div>
-  <div id="toast"></div>
+<div class="app-box">
+  <img src="https://i.postimg.cc/rmfjc5Yn/IMG-6009.jpg" class="main-image">
+  <h2>🎤 501호 오픈 마이크</h2>
 
-  <div class="app-box">
-    <div class="title-wrap">
-      <h2>&#127908; 501호 오픈 마이크</h2>
-      <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">&#127769;</button>
-    </div>
+  <label>📅 레슨 날짜</label>
+  <input type="date" id="date">
 
-<img src="https://i.postimg.cc/rmfjc5Yn/IMG-6009.jpg" alt="메인 사진" class="main-image">
+  <label>🎵 곡명 (연습곡)</label>
+  <input type="text" id="song" placeholder="곡 제목을 입력하세요">
 
-<label>&#128197; 레슨 날짜</label>
-<input type="date" id="date">
+  <label>📝 오늘 배운 내용</label>
+  <textarea id="overview"></textarea>
 
-<label>&#127925; 곡명 (연습곡)</label>
-<textarea id="song" rows="3" placeholder="예: 변하은 - 기지개, 다음 곡 - 제목"></textarea>
+  <label>💡 스승님의 특급 꿀팁</label>
+  <textarea id="tips"></textarea>
 
-<label>&#128221; 오늘 배운 내용</label>
-<textarea id="overview" rows="4" placeholder="배운 기술이나 이론"></textarea>
+  <label>🎸 새로 배운 코드</label>
+  <div id="chordContainer"></div>
+  <div class="add-btn" onclick="addRow('chordContainer', '코드명(Ab)', '링크')">+ 코드 추가</div>
 
-<label>&#128161; 스승님의 특급 꿀팁</label>
-<textarea id="tips" rows="3" placeholder="잊지 말아야 할 포인트!"></textarea>
+  <label>🔗 참고 자료 (제목과 링크)</label>
+  <div id="resourceContainer"></div>
+  <div class="add-btn" onclick="addRow('resourceContainer', '자료 이름', '링크')">+ 자료 추가</div>
 
-<label>&#127928; 새로 배운 코드</label>
-<div id="chordInputContainer"></div>
-<div class="add-row-btn" onclick="addDynamicRow('chordInputContainer','chord-name','chord-link','코드명','이미지 링크')">+ 코드 칸 추가하기</div>
+  <label>🔥 다음 주 과제</label>
+  <textarea id="homework"></textarea>
 
-<label>&#128293; 다음 주 과제</label>
-<textarea id="homework" rows="3" placeholder="이번 주 숙제는?"></textarea>
+  <button id="saveBtn" onclick="saveLesson()">기록 저장하기</button>
 
-<label>&#128173; 나의 연습 일기 &amp; 궁금증</label>
-<textarea id="selfNote" rows="3" placeholder="연습하며 느낀 점, 질문 등"></textarea>
-
-<label>&#128279; 참고 자료 (여러 개 등록 가능)</label>
-<div id="linkInputContainer"></div>
-<div class="add-row-btn" onclick="addDynamicRow('linkInputContainer','link-name','link-url','자료 이름','주소(https://...)')">+ 자료 링크 추가하기</div>
-
-<button id="saveBtn" onclick="saveLesson()">누가 그랬던가 잊혀져 간다는 게 일부러 그런 건 아닙디다</button>
-
-<hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--border-color);">
-
-<button class="toggle-ency-btn" onclick="toggleEncyclopedia()">&#128218; 나의 코드 도감 보기</button>
-<div class="chord-encyclopedia" id="chordEncy">
-  <div class="ency-title">모든 수집 코드 <span id="encyCount" style="color:var(--accent-blue); font-size:0.8em;">0개</span></div>
-  <div class="ency-grid" id="encyGrid"></div>
+  <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+  <div id="lessonList"></div>
 </div>
 
-<input type="text" id="searchInput" placeholder="&#128269; 곡명, 내용 검색..." oninput="renderList()" style="margin-top: 10px;">
-<div id="lessonList"></div>
+<script>
+  let editTargetId = null;
 
-<div class="data-management">
-  <p style="font-size: 0.85em; color: var(--text-sub); font-weight: 600;">&#128190; 데이터 관리</p>
-  <div class="data-btns">
-    <button onclick="exportData()">백업</button>
-    <label for="importData" class="import-label">복구</label>
-    <input type="file" id="importData" accept=".json" style="display:none;" onchange="importData(event)">
-  </div>
-</div>
+  window.onload = () => {
+    renderList();
+    addRow('chordContainer', '코드명(Ab)', '링크');
+    addRow('resourceContainer', '자료 이름', '링크');
+  };
 
-  </div>
+  // 행 추가 함수 (코드와 자료 공통 사용)
+  function addRow(containerId, p1, p2, v1 = '', v2 = '') {
+    const container = document.getElementById(containerId);
+    const row = document.createElement('div');
+    row.className = 'dynamic-row';
+    row.innerHTML = `
+      <input type="text" class="name-input" placeholder="${p1}" value="${v1}">
+      <input type="text" class="link-input" placeholder="${p2}" value="${v2}">
+    `;
+    container.appendChild(row);
+  }
 
-  <script>
-    function esc(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#x27;');
-    }
-    function escNl(str) { return esc(str).replace(/\n/g, '<br>'); }
-    function safeUrl(url) {
-      if (!url) return '#';
-      var trimmed = url.trim();
-      return /^https?:\/\//i.test(trimmed) ? trimmed : '#';
-    }
+  function saveLesson() {
+    const date = document.getElementById('date').value;
+    const song = document.getElementById('song').value;
+    const overview = document.getElementById('overview').value;
+    const tips = document.getElementById('tips').value;
+    const homework = document.getElementById('homework').value;
 
-    var _toastTimer = null;
-    function showToast(msg, type, duration) {
-      if (!type) type = 'success';
-      if (!duration) duration = 2500;
-      var t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = 'show ' + type;
-      clearTimeout(_toastTimer);
-      _toastTimer = setTimeout(function() { t.className = ''; }, duration);
-    }
+    if(!date || !overview) { alert('날짜와 내용은 필수입니다!'); return; }
 
-    function setTodayDate() {
-      var d = document.getElementById('date');
-      if (!d.value) d.value = new Date().toISOString().split('T')[0];
-    }
+    // 코드 데이터 수집
+    const chords = [];
+    document.querySelectorAll('#chordContainer .dynamic-row').forEach(row => {
+      const name = row.querySelector('.name-input').value;
+      const link = row.querySelector('.link-input').value;
+      if(name) chords.push({ name, link });
+    });
 
-    function checkBackupReminder() {
-      var last = localStorage.getItem('lastBackupDate');
-      var banner = document.getElementById('backupBanner');
-      if (!last) { banner.style.display = 'none'; return; }
-      var days = (Date.now() - Number(last)) / (1000 * 60 * 60 * 24);
-      banner.style.display = days >= 7 ? 'flex' : 'none';
-    }
+    // 참고 자료 데이터 수집 (제목과 링크 모두 수집)
+    const resources = [];
+    document.querySelectorAll('#resourceContainer .dynamic-row').forEach(row => {
+      const name = row.querySelector('.name-input').value;
+      const link = row.querySelector('.link-input').value;
+      if(name) resources.push({ name, link });
+    });
 
-    function initTheme() {
-      var saved = localStorage.getItem('theme') || 'light';
-      document.body.setAttribute('data-theme', saved);
-      document.getElementById('themeBtn').innerText = saved === 'light' ? '\uD83C\uDF19' : '\u2600\uFE0F';
-    }
-    function toggleTheme() {
-      var cur = document.body.getAttribute('data-theme');
-      var next = cur === 'light' ? 'dark' : 'light';
-      document.body.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-      document.getElementById('themeBtn').innerText = next === 'light' ? '\uD83C\uDF19' : '\u2600\uFE0F';
+    let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
+    const lessonData = { id: editTargetId || Date.now(), date, song, overview, tips, chords, resources, homework };
+
+    if(editTargetId) {
+      const idx = lessons.findIndex(l => l.id === editTargetId);
+      lessons[idx] = lessonData;
+      editTargetId = null;
+      document.getElementById('saveBtn').innerText = '기록 저장하기';
+    } else {
+      lessons.unshift(lessonData);
     }
 
-    function toggleEncyclopedia() {
-      var ency = document.getElementById('chordEncy');
-      var btn = document.querySelector('.toggle-ency-btn');
-      if (ency.style.display === 'block') {
-        ency.style.display = 'none';
-        btn.innerText = '\uD83D\uDCDA 나의 코드 도감 보기';
-      } else {
-        ency.style.display = 'block';
-        btn.innerText = '닫기';
-        updateEncyclopedia();
-      }
+    localStorage.setItem('guitarLessons', JSON.stringify(lessons));
+    location.reload(); 
+  }
+
+  function renderList() {
+    const list = document.getElementById('lessonList');
+    const lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
+    list.innerHTML = '';
+
+    lessons.forEach(l => {
+      const item = document.createElement('div');
+      item.className = 'record-item';
+      item.innerHTML = `
+        <div class="record-header" onclick="toggleDetails(${l.id})">
+          <h3>📅 ${l.date}</h3>
+          <span class="song-badge">${l.song || '연습곡'}</span>
+        </div>
+        <div class="record-details" id="details-${l.id}">
+          <p><strong>📝 내용:</strong><br>${l.overview.replace(/\n/g, '<br>')}</p>
+          ${l.tips ? `<p><strong>💡 꿀팁:</strong><br>${l.tips.replace(/\n/g, '<br>')}</p>` : ''}
+          
+          ${l.chords && l.chords.length > 0 ? `<div class="chord-grid">` + 
+            l.chords.map(c => `<div class="chord-card"><p>${c.name}</p>${c.link ? `<a href="${c.link}" target="_blank" class="mini-link-btn">보기</a>` : ''}</div>`).join('') + `</div>` : ''}
+          
+          ${l.resources && l.resources.length > 0 ? `<div class="resource-links">` + 
+            l.resources.map(r => `<a href="${r.link}" target="_blank" class="res-btn">📁 ${r.name}</a>`).join('') + `</div>` : ''}
+          
+          <p><strong>🔥 과제:</strong> ${l.homework || '없음'}</p>
+          <div class="action-btns">
+            <button class="edit-btn" onclick="editLesson(${l.id})">수정</button>
+            <button class="delete-btn" onclick="deleteLesson(${l.id})">삭제</button>
+          </div>
+        </div>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  function toggleDetails(id) {
+    const el = document.getElementById(`details-${id}`);
+    if (el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function editLesson(id) {
+    const lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
+    const l = lessons.find(l => l.id === id);
+    if(!l) return;
+
+    document.getElementById('date').value = l.date;
+    document.getElementById('song').value = l.song;
+    document.getElementById('overview').value = l.overview;
+    document.getElementById('tips').value = l.tips;
+    document.getElementById('homework').value = l.homework;
+
+    document.getElementById('chordContainer').innerHTML = '';
+    if(l.chords && l.chords.length > 0) {
+      l.chords.forEach(c => addRow('chordContainer', '코드명(Ab)', '링크', c.name, c.link));
+    } else {
+      addRow('chordContainer', '코드명(Ab)', '링크');
     }
-    function updateEncyclopedia() {
-      var lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
-      var grid = document.getElementById('encyGrid');
-      var countEl = document.getElementById('encyCount');
-      var map = {};
-      var keys = [];
-      lessons.forEach(function(l) {
-        (l.chordsList || []).forEach(function(c) {
-          var name = (c.name || '').trim();
-          if (name && !map.hasOwnProperty(name)) {
-            map[name] = c.link || '';
-            keys.push(name);
-          }
-        });
-      });
-      keys.sort(function(a, b) { return a.localeCompare(b); });
-      countEl.innerText = keys.length + '\uAC1C';
-      grid.innerHTML = keys.map(function(name) {
-        var safe = safeUrl(map[name]);
-        var linkHtml = safe !== '#' ? '<a href="' + esc(safe) + '" target="_blank" rel="noopener noreferrer" class="ency-link-btn">\uD83D\uDDBC\uFE0F \uBCF4\uAE30</a>' : '';
-        return '<div class="ency-item"><p>' + esc(name) + '</p>' + linkHtml + '</div>';
-      }).join('');
-    }
-
-    function addDynamicRow(containerId, nameClass, linkClass, namePh, linkPh, nameVal, linkVal) {
-      if (nameVal === undefined) nameVal = '';
-      if (linkVal === undefined) linkVal = '';
-      var container = document.getElementById(containerId);
-      var row = document.createElement('div');
-      row.className = 'dynamic-input-row';
-
-      var nameInput = document.createElement('input');
-      nameInput.type = 'text';
-      nameInput.className = nameClass;
-      nameInput.placeholder = namePh;
-      nameInput.value = nameVal;
-
-      var linkInput = document.createElement('input');
-      linkInput.type = 'text';
-      linkInput.className = linkClass;
-      linkInput.placeholder = linkPh;
-      linkInput.value = linkVal;
-
-      var removeBtn = document.createElement('button');
-      removeBtn.className = 'remove-row-btn';
-      removeBtn.innerHTML = '&#x2715;';
-      removeBtn.title = '\uC0AD\uC81C';
-      removeBtn.addEventListener('click', function() {
-        var rows = container.querySelectorAll('.dynamic-input-row');
-        if (rows.length <= 1) {
-          nameInput.value = '';
-          linkInput.value = '';
-        } else {
-          row.remove();
-        }
-      });
-
-      row.appendChild(nameInput);
-      row.appendChild(linkInput);
-      row.appendChild(removeBtn);
-      container.appendChild(row);
+    
+    document.getElementById('resourceContainer').innerHTML = '';
+    if(l.resources && l.resources.length > 0) {
+      l.resources.forEach(r => addRow('resourceContainer', '자료 이름', '링크', r.name, r.link));
+    } else {
+      addRow('resourceContainer', '자료 이름', '링크');
     }
 
-    var editTargetId = null;
+    editTargetId = id;
+    document.getElementById('saveBtn').innerText = '✨ 수정 완료하기';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
-    function saveLesson() {
-      var date     = document.getElementById('date').value;
-      var song     = document.getElementById('song').value;
-      var overview = document.getElementById('overview').value;
-      var tips     = document.getElementById('tips').value;
-      var homework = document.getElementById('homework').value;
-      var selfNote = document.getElementById('selfNote').value;
-
-      if (!date || !overview) {
-        showToast('\uD83D\uDCC5 \uB0A0\uC9DC\uC640 \uBC30\uC6B4 \uB0B4\uC6A9\uC740 \uD544\uC218\uC608\uC694!', 'error');
-        return;
-      }
-
-      var chordsList = [];
-      document.querySelectorAll('#chordInputContainer .dynamic-input-row').forEach(function(row) {
-        var name = row.querySelector('.chord-name').value.trim();
-        var link = row.querySelector('.chord-link').value.trim();
-        if (name || link) chordsList.push({ name: name, link: link });
-      });
-
-      var linksList = [];
-      document.querySelectorAll('#linkInputContainer .dynamic-input-row').forEach(function(row) {
-        var name = row.querySelector('.link-name').value.trim();
-        var url  = row.querySelector('.link-url').value.trim();
-        if (name || url) linksList.push({ name: name, url: url });
-      });
-
-      var lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
-      var data = { id: editTargetId || Date.now(), date: date, song: song, overview: overview, tips: tips, chordsList: chordsList, linksList: linksList, homework: homework, selfNote: selfNote };
-
-      if (editTargetId) {
-        var idx = -1;
-        for (var i = 0; i < lessons.length; i++) { if (lessons[i].id === editTargetId) { idx = i; break; } }
-        if (idx !== -1) lessons[idx] = data;
-        editTargetId = null;
-        document.getElementById('saveBtn').innerText = '\uB204\uAC00 \uADF8\uB790\uB358\uAC00 \uC78A\uD600\uC838 \uAC04\uB2E4\uB294 \uAC8C \uC77C\uBD80\uB7EC \uADF8\uB7F0 \uAC74 \uC544\uB2D8\uB514\uB2E4';
-        showToast('\u270F\uFE0F \uC218\uC815 \uC644\uB8CC!', 'success');
-      } else {
-        lessons.unshift(data);
-        showToast('\u2705 \uC800\uC7A5 \uC644\uB8CC!', 'success');
-      }
-
+  function deleteLesson(id) {
+    if(confirm('정말 삭제할까요?')) {
+      let lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
+      lessons = lessons.filter(l => l.id !== id);
       localStorage.setItem('guitarLessons', JSON.stringify(lessons));
       renderList();
-      updateEncyclopedia();
-      resetForm();
     }
-
-    function resetForm() {
-      ['date','song','overview','tips','homework','selfNote'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) el.value = '';
-      });
-      document.getElementById('chordInputContainer').innerHTML = '';
-      document.getElementById('linkInputContainer').innerHTML = '';
-      addDynamicRow('chordInputContainer', 'chord-name', 'chord-link', '\ucf54\ub4dc\uba85', '\uc774\ubbf8\uc9c0 \ub9c1\ud06c');
-      addDynamicRow('linkInputContainer', 'link-name', 'link-url', '\uc790\ub8cc \uc774\ub984', '\uc8fc\uc18c(https://...)');
-      setTodayDate();
-    }
-
-    function renderList() {
-      var list    = document.getElementById('lessonList');
-      var lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
-      var kw      = document.getElementById('searchInput').value.toLowerCase();
-
-      var filtered = lessons.filter(function(l) {
-        var chordNames = (l.chordsList || []).map(function(c) { return c.name || ''; }).join(' ');
-        var txt = [l.date || '', l.song || '', l.overview || '', chordNames].join(' ').toLowerCase();
-        return txt.indexOf(kw) !== -1;
-      });
-
-      list.innerHTML = filtered.map(function(lesson) {
-        var chordsArr = (lesson.chordsList || []).filter(function(c) { return c.name; });
-        var chordsHtml = '';
-        if (chordsArr.length > 0) {
-          chordsHtml = '<div class="chord-grid">' + chordsArr.map(function(c) {
-            var safe = safeUrl(c.link);
-            var lh = safe !== '#' ? '<a href="' + esc(safe) + '" target="_blank" rel="noopener noreferrer" class="chord-link-btn">\uD83D\uDDBC\uFE0F \uBCF4\uAE30</a>' : '';
-            return '<div class="chord-card"><p>' + esc(c.name) + '</p>' + lh + '</div>';
-          }).join('') + '</div>';
-        }
-
-        var linksArr = (lesson.linksList || []).filter(function(l) { return l.name || l.url; });
-        var linksHtml = '';
-        if (linksArr.length > 0) {
-          linksHtml = '<div class="link-list-wrap"><strong>\uD83D\uDCC1 \uCC38\uACE0 \uC790\uB8CC:</strong><br>' +
-            linksArr.map(function(l) {
-              var safe = safeUrl(l.url);
-              return '<a href="' + esc(safe) + '" target="_blank" rel="noopener noreferrer" class="link-item">\uD83D\uDD17 ' + esc(l.name || '\ub9c1\ud06c') + '</a>';
-            }).join('') + '</div>';
-        }
-
-        var songBadge = lesson.song ? '<span class="song-badge">\uD83C\uDFB5 ' + escNl(lesson.song) + '</span>' : '';
-        var tipsHtml  = lesson.tips     ? '<p><strong>\uD83D\uDCA1 \uAF2C\uD314:</strong><br>' + escNl(lesson.tips) + '</p>' : '';
-        var hwHtml    = lesson.homework ? '<p style="color:var(--danger);"><strong>\uD83D\uDD25 \uACFC\uC81C:</strong><br>' + escNl(lesson.homework) + '</p>' : '';
-        var snHtml    = lesson.selfNote ? '<p style="color:var(--accent-blue);"><strong>\uD83D\uDCAD \uB098\uC758 \uC5F0\uC2B5 \uC77C\uAE30:</strong><br>' + escNl(lesson.selfNote) + '</p>' : '';
-
-        return '<div class="record-item">' +
-          '<div class="record-header" onclick="toggleDetails(' + lesson.id + ')">' +
-            '<h3>\uD83D\uDCC5 ' + esc(lesson.date) + '</h3>' + songBadge +
-          '</div>' +
-          '<div class="record-details" id="details-' + lesson.id + '">' +
-            '<p><strong>\uD83D\uDCDD \uBC30\uC6B4 \uB0B4\uC6A9:</strong><br>' + escNl(lesson.overview) + '</p>' +
-            tipsHtml + chordsHtml + hwHtml + snHtml + linksHtml +
-            '<div class="action-btns">' +
-              '<button class="edit-btn" onclick="editLesson(' + lesson.id + ')">\uC218\uC815</button>' +
-              '<button class="delete-btn" onclick="deleteLesson(' + lesson.id + ')">\uC0AD\uC81C</button>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
-      }).join('');
-    }
-
-    function toggleDetails(id) {
-      var d = document.getElementById('details-' + id);
-      d.style.display = d.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function editLesson(id) {
-      var lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
-      var l = null;
-      for (var i = 0; i < lessons.length; i++) { if (lessons[i].id === id) { l = lessons[i]; break; } }
-      if (!l) return;
-
-      document.getElementById('date').value     = l.date     || '';
-      document.getElementById('song').value     = l.song     || '';
-      document.getElementById('overview').value = l.overview || '';
-      document.getElementById('tips').value     = l.tips     || '';
-      document.getElementById('homework').value = l.homework || '';
-      document.getElementById('selfNote').value = l.selfNote || '';
-
-      var cc = document.getElementById('chordInputContainer');
-      cc.innerHTML = '';
-      var cl = (l.chordsList && l.chordsList.length) ? l.chordsList : [{}];
-      cl.forEach(function(c) { addDynamicRow('chordInputContainer','chord-name','chord-link','\ucf54\ub4dc\uba85','\uc774\ubbf8\uc9c0 \ub9c1\ud06c', c.name||'', c.link||''); });
-
-      var lc = document.getElementById('linkInputContainer');
-      lc.innerHTML = '';
-      var ll = (l.linksList && l.linksList.length) ? l.linksList : [{}];
-      ll.forEach(function(link) { addDynamicRow('linkInputContainer','link-name','link-url','\uc790\ub8cc \uc774\ub984','\uc8fc\uc18c(https://...)', link.name||'', link.url||''); });
-
-      editTargetId = id;
-      document.getElementById('saveBtn').innerText = '\u2728 \uC218\uC815 \uC644\uB8CC\uD558\uAE30';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function deleteLesson(id) {
-      if (!confirm('\uc774 \ub808\uc2a8 \uae30\ub85d\uc744 \uc0ad\uc81c\ud560\uae4c\uc694?')) return;
-      var lessons = JSON.parse(localStorage.getItem('guitarLessons')) || [];
-      localStorage.setItem('guitarLessons', JSON.stringify(lessons.filter(function(l) { return l.id !== id; })));
-      renderList();
-      updateEncyclopedia();
-      showToast('\uD83D\uDDD1\uFE0F \uC0AD\uC81C\uB418\uC5C8\uC5B4\uC694', 'warning');
-    }
-
-    function exportData() {
-      var data = localStorage.getItem('guitarLessons');
-      if (!data) { showToast('\uC800\uC7A5\uB41C \uB370\uC774\uD130\uAC00 \uC5C6\uC5B4\uC694', 'error'); return; }
-      var blob = new Blob([data], { type: 'application/json' });
-      var a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      var today = new Date().toISOString().split('T')[0];
-      a.download = 'guitar_backup_' + today + '.json';
-      a.click();
-      localStorage.setItem('lastBackupDate', String(Date.now()));
-      document.getElementById('backupBanner').style.display = 'none';
-      showToast('\uD83D\uDCBE \uBC31\uC5C5 \uD30C\uC77C \uC800\uC7A5 \uC644\uB8CC!', 'success');
-    }
-
-    function importData(event) {
-      var file = event.target.files[0];
-      if (!file) return;
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          JSON.parse(e.target.result);
-          localStorage.setItem('guitarLessons', e.target.result);
-          renderList();
-          updateEncyclopedia();
-          showToast('\u2705 \uBCF5\uAD6C \uC644\uB8CC!', 'success');
-        } catch(err) {
-          showToast('\u274C \uD30C\uC77C\uC774 \uC62C\uBC14\uB974\uC9C0 \uC54A\uC544\uC694', 'error');
-        }
-      };
-      reader.readAsText(file);
-      event.target.value = '';
-    }
-
-    function injectManifest() {
-      var manifest = {
-        name: '501\ud638 \uc624\ud508 \ub9c8\uc774\ud06c',
-        short_name: '501\ud638 \ub808\uc2a8',
-        start_url: '.',
-        display: 'standalone',
-        background_color: '#f4f5f7',
-        theme_color: '#222222',
-        icons: [
-          { src: 'https://i.postimg.cc/C1bnY8Ln/IMG-6011.jpg', sizes: '192x192', type: 'image/jpeg' },
-          { src: 'https://i.postimg.cc/C1bnY8Ln/IMG-6011.jpg', sizes: '512x512', type: 'image/jpeg' }
-        ]
-      };
-      var blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-      var link = document.createElement('link');
-      link.rel = 'manifest';
-      link.href = URL.createObjectURL(blob);
-      document.head.appendChild(link);
-    }
-
-    function registerServiceWorker() {
-      if (!('serviceWorker' in navigator)) return;
-      var swLines = [
-        "var CACHE = 'guitar-lesson-v1';",
-        "self.addEventListener('install', function(e) {",
-        "  e.waitUntil(caches.open(CACHE).then(function(c) { return c.addAll([self.location.pathname]); }));",
-        "  self.skipWaiting();",
-        "});",
-        "self.addEventListener('activate', function(e) {",
-        "  e.waitUntil(caches.keys().then(function(keys) {",
-        "    return Promise.all(keys.filter(function(k){return k!==CACHE;}).map(function(k){return caches.delete(k);}));",
-        "  }));",
-        "  self.clients.claim();",
-        "});",
-        "self.addEventListener('fetch', function(e) {",
-        "  e.respondWith(caches.match(e.request).then(function(cached){",
-        "    return cached || fetch(e.request).catch(function(){return cached;});",
-        "  }));",
-        "});"
-      ];
-      var blob = new Blob([swLines.join('\n')], { type: 'application/javascript' });
-      navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(function() {});
-    }
-
-    window.onload = function() {
-      initTheme();
-      setTodayDate();
-      checkBackupReminder();
-      renderList();
-      updateEncyclopedia();
-      injectManifest();
-      registerServiceWorker();
-      if (!document.querySelector('#chordInputContainer .dynamic-input-row'))
-        addDynamicRow('chordInputContainer', 'chord-name', 'chord-link', '\ucf54\ub4dc\uba85', '\uc774\ubbf8\uc9c0 \ub9c1\ud06c');
-      if (!document.querySelector('#linkInputContainer .dynamic-input-row'))
-        addDynamicRow('linkInputContainer', 'link-name', 'link-url', '\uc790\ub8cc \uc774\ub984', '\uc8fc\uc18c(https://...)');
-    };
-  </script>
-
+  }
+</script>
 </body>
 </html>
